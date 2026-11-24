@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>서해 탐험대 – 화성 바다와 갯벌 도감을 완성하라!</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
+<style>
+[hidden]{display:none!important}
+:root{--acc:#ff7a59;--acc2:#ffb199;--gold:#ffcf33;--nat:#34b26b;--hum:#5b7cfa;--ink:#2b2b3a;--bg:#fffaf2}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#222;font-family:Pretendard,"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;color:var(--ink)}
+#c{position:fixed;inset:0;display:block;touch-action:none;cursor:grab}
+button{font-family:inherit;cursor:pointer}
+.chip{background:#fff;border:3px solid #fff;border-radius:999px;padding:4px 12px;font-weight:800;font-size:15px;box-shadow:0 4px 0 rgba(0,0,0,.18);display:flex;align-items:center;gap:6px;white-space:nowrap}
+#hud{position:fixed;inset:0;pointer-events:none}
+#hud > *{pointer-events:auto}
+#top{position:absolute;left:10px;right:10px;top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;pointer-events:none}
+#top > *{pointer-events:auto}
+#top .sp{flex:1}
+#region{background:var(--acc);color:#fff}
+.lv{color:var(--acc)}
+.xpbar{width:70px;height:10px;background:#eee;border-radius:9px;overflow:hidden}
+.xpbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),#ff9f1a);transition:width .3s}
+.ib{width:46px;height:46px;border-radius:50%;border:3px solid #fff;background:var(--acc);font-size:22px;box-shadow:0 4px 0 rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;flex-direction:column;line-height:1}
+.ib small{font-size:9px;color:#fff;font-weight:800;margin-top:1px}
+#tidechip{background:#e6f4ff}
+#quest{position:absolute;left:10px;top:66px;max-width:340px;background:rgba(255,255,255,.95);border:3px solid #fff;border-radius:18px;padding:8px 12px;display:flex;gap:10px;align-items:center;box-shadow:0 5px 0 rgba(0,0,0,.18)}
+.qarrow{width:34px;height:34px;flex:none;border-radius:50%;background:var(--acc);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.qt{font-weight:900;font-size:15px}
+.qh{font-size:13px;color:#555;line-height:1.35;margin-top:2px}
+.qd{font-size:12px;font-weight:800;color:var(--acc);white-space:nowrap}
+#mini{position:absolute;right:10px;top:66px;width:180px;height:140px;border:3px solid #fff;border-radius:16px;box-shadow:0 5px 0 rgba(0,0,0,.18);background:#cfe9f7;cursor:pointer}
+#prompt{position:absolute;left:50%;bottom:96px;transform:translateX(-50%);background:#fff;border-radius:999px;padding:8px 16px;font-weight:800;box-shadow:0 4px 0 rgba(0,0,0,.2);border:3px solid var(--acc);white-space:nowrap;cursor:pointer}
+kbd{background:var(--acc);color:#fff;border-radius:6px;padding:1px 7px;font-family:inherit;font-weight:900}
+#tabs{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:flex;gap:6px;background:rgba(255,255,255,.9);padding:6px;border-radius:20px;box-shadow:0 5px 0 rgba(0,0,0,.18)}
+#tabs button{border:none;background:#fff3ea;border-radius:14px;padding:6px 10px;font-size:20px;display:flex;flex-direction:column;align-items:center;min-width:58px;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+#tabs button span{font-size:11px;font-weight:800;color:#444;margin-top:2px}
+#tabs button:active{transform:translateY(2px)}
+#tabs button.hot{background:var(--gold);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{transform:scale(1.07)}}
+#toasts{position:fixed;left:50%;top:70px;transform:translateX(-50%);display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none;z-index:30}
+.toast{background:#2b2b3a;color:#fff;padding:9px 18px;border-radius:999px;font-weight:800;font-size:15px;box-shadow:0 4px 0 rgba(0,0,0,.25);animation:tin .25s ease-out}
+.toast.good{background:var(--nat)}.toast.gold{background:#ff9f1a}.toast.blue{background:var(--hum)}
+@keyframes tin{from{opacity:0;transform:translateY(-10px)}}
+#dialog{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);width:min(640px,94vw);background:#fff;border:4px solid var(--acc);border-radius:22px;padding:14px;display:flex;gap:12px;box-shadow:0 7px 0 rgba(0,0,0,.25);z-index:20}
+.dicon{font-size:44px;width:62px;height:62px;flex:none;background:#fff3ea;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.dbody{flex:1}
+.dwho{font-weight:900;color:var(--acc);font-size:15px}
+.dtext{font-size:17px;line-height:1.55;margin-top:3px;word-break:keep-all}
+.dchoices{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.dchoices button,.btn{border:3px solid #fff;background:var(--acc);color:#fff;font-weight:900;font-size:15px;border-radius:14px;padding:9px 16px;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+#dNext{align-self:flex-end;border:none;background:var(--acc);color:#fff;font-weight:900;border-radius:12px;padding:8px 14px;font-size:14px}
+#modal{position:fixed;inset:0;background:rgba(20,20,40,.45);display:flex;align-items:center;justify-content:center;z-index:25;padding:12px}
+.mbox{position:relative;background:var(--bg);border:4px solid #fff;border-radius:24px;width:min(760px,100%);max-height:92vh;overflow:auto;padding:20px;box-shadow:0 8px 0 rgba(0,0,0,.25)}
+.mclose{position:absolute;right:10px;top:10px;width:38px;height:38px;border-radius:50%;border:3px solid #fff;background:#ff6b6b;color:#fff;font-weight:900;font-size:16px;box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.mbox h2{margin:0 0 10px;font-size:22px}
+.mbox h3{margin:14px 0 8px;font-size:17px}
+.mbox p{line-height:1.6;word-break:keep-all}
+.card{text-align:center}
+.card .big{font-size:64px}
+.card p{text-align:left;background:#fff;border-radius:14px;padding:12px 14px}
+.two{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.two button{flex:1;min-width:140px;font-size:19px;padding:14px}
+.nat{background:var(--nat)!important}.hum{background:var(--hum)!important}
+.fb{margin-top:12px;border-radius:14px;padding:12px;text-align:left;line-height:1.6;font-weight:600}
+.fb.ok{background:#e3f7ea;border:3px solid var(--nat)}.fb.no{background:#ffecec;border:3px solid #ff6b6b}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.opts button{border:3px solid #fff;background:#fff;color:var(--ink);font-weight:800;font-size:16px;border-radius:14px;padding:12px;box-shadow:0 4px 0 rgba(0,0,0,.15);text-align:left}
+.opts button.right{background:#c9f2d6}.opts button.wrong{background:#ffd5d5}
+.dexcols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dexcol h3{margin:0 0 8px;color:#fff;border-radius:12px;padding:6px 10px}
+.dexcol.N h3{background:var(--nat)}.dexcol.H h3{background:var(--hum)}
+.dexgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.dexitem{background:#fff;border-radius:14px;padding:8px 4px;text-align:center;border:3px solid #fff;box-shadow:0 3px 0 rgba(0,0,0,.1);font-size:13px;font-weight:800;cursor:pointer}
+.dexitem .i{font-size:30px}
+.dexitem.no{opacity:.55;cursor:default}
+.dexitem.miss{border-color:#ffb3b3}
+.mlist{display:flex;flex-direction:column;gap:6px}
+.mi{background:#fff;border-radius:14px;padding:9px 12px;display:flex;gap:10px;align-items:center;font-weight:700}
+.mi .s{font-size:20px}
+.mi small{display:block;font-weight:500;color:#666}
+.mi.done{opacity:.6}.mi.now{border:3px solid var(--acc)}
+.album{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.album figure{margin:0;background:#fff;padding:6px;border-radius:12px;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.album img{width:100%;border-radius:8px;display:block}
+.album figcaption{font-size:12px;font-weight:700;text-align:center;margin-top:4px}
+.shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.shop button{background:#fff;border:3px solid #fff;border-radius:14px;padding:10px 4px;font-weight:800;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.shop button.on{border-color:var(--acc);background:#fff3ea}
+.shop .sw{width:36px;height:36px;border-radius:50%;margin:0 auto 4px;border:3px solid #fff;box-shadow:0 0 0 2px #ddd}
+.shop .hi{font-size:30px}
+.boss{text-align:center}
+.hpbar{height:16px;background:#eee;border-radius:9px;overflow:hidden;margin:8px auto;max-width:360px}
+.hpbar i{display:block;height:100%;background:linear-gradient(90deg,#ff6b6b,#ff9f1a);transition:width .3s}
+.hearts{font-size:24px}
+.bossq{font-size:19px;font-weight:800;background:#fff;border-radius:14px;padding:14px;margin-top:10px;line-height:1.5;word-break:keep-all}
+.cert{background:#fff;border:6px double #d4a017;border-radius:16px;padding:24px;text-align:center}
+.cert h1{margin:6px 0;font-size:28px;color:#b8860b}
+.cert .nm{font-size:30px;font-weight:900;margin:10px 0}
+#photoUI{position:fixed;inset:0;z-index:22;pointer-events:none}
+#photoUI .frame{position:absolute;left:20%;right:20%;top:20%;bottom:20%;border:4px dashed #fff;border-radius:18px;box-shadow:0 0 0 9999px rgba(0,0,0,.35)}
+#photoUI .hint{position:absolute;left:50%;top:12%;transform:translateX(-50%);color:#fff;font-weight:900;font-size:17px;text-shadow:0 2px 4px #000;white-space:nowrap}
+#shutter{pointer-events:auto;position:absolute;left:50%;bottom:24px;transform:translateX(-50%);width:76px;height:76px;border-radius:50%;border:6px solid #fff;background:var(--acc);font-size:30px;box-shadow:0 5px 0 rgba(0,0,0,.3)}
+#photoClose{pointer-events:auto;position:absolute;right:16px;top:16px;width:46px;height:46px;border-radius:50%;border:3px solid #fff;background:#ff6b6b;color:#fff;font-size:18px;font-weight:900}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .35s}
+#touch{display:none}
+body.touch #touch{display:block}
+#joy{position:absolute;left:18px;bottom:96px;width:124px;height:124px;border-radius:50%;background:rgba(255,255,255,.35);border:3px solid rgba(255,255,255,.8);touch-action:none}
+#knob{position:absolute;left:37px;top:37px;width:50px;height:50px;border-radius:50%;background:#fff;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+#tbtns{position:absolute;right:16px;bottom:96px;display:grid;grid-template-columns:repeat(2,62px);gap:10px}
+#tbtns button{width:62px;height:62px;border-radius:50%;border:3px solid #fff;background:var(--acc);font-size:24px;box-shadow:0 4px 0 rgba(0,0,0,.25);color:#fff;font-weight:900;touch-action:manipulation}
+body.touch #prompt kbd{display:none}
+#start,#loading{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:14px;background:linear-gradient(160deg,var(--acc2),var(--acc))}
+.sbox{background:var(--bg);border:5px solid #fff;border-radius:28px;padding:26px;width:min(560px,100%);max-height:94vh;overflow:auto;text-align:center;box-shadow:0 10px 0 rgba(0,0,0,.2)}
+.logo{font-size:56px}
+.sbox h1{margin:6px 0 4px;font-size:28px;line-height:1.25;word-break:keep-all}
+.sbox .sub{color:#666;font-weight:700;margin:0 0 14px;word-break:keep-all}
+.sbox input{width:100%;font-size:19px;padding:12px;border-radius:14px;border:3px solid #eee;text-align:center;font-family:inherit;font-weight:800}
+.sbox .row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.sbox .row .btn{flex:1;font-size:18px;padding:13px}
+.btn.gray{background:#9aa0aa}
+.how{text-align:left;background:#fff;border-radius:16px;padding:12px 16px;margin-top:14px;font-size:14px;line-height:1.7}
+.how b{color:var(--acc)}
+.bus{font-size:60px;animation:drive 1.2s ease-in-out infinite}
+@keyframes drive{50%{transform:translateX(16px) rotate(-3deg)}}
+.legend{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;font-size:13px;font-weight:700;margin-top:8px}
+.legend span{background:#fff;border-radius:999px;padding:3px 10px}
+#bigmap{width:100%;border-radius:14px;display:block;background:#cfe9f7}
+@media (max-width:640px){
+ #quest{max-width:calc(100vw - 20px);top:60px;padding:6px 10px}
+ .qh{display:none}
+ #mini{top:auto;bottom:96px;width:120px;height:94px;right:auto;left:50%;transform:translateX(-50%)}
+ body.touch #mini{display:none}
+ #tabs button{min-width:46px;padding:5px 6px;font-size:18px}
+ #tabs button span{font-size:10px}
+ .chip{font-size:13px;padding:3px 9px}
+ .xpbar{width:44px}
+ .dexcols{grid-template-columns:1fr}
+ .opts{grid-template-columns:1fr}
+ .ib{width:40px;height:40px;font-size:19px}
+ #top{gap:5px}
+ #top > .chip:nth-child(4){display:none}
+ #quest{top:58px;max-width:calc(100vw - 110px)}
+ body.touch #prompt{bottom:auto;top:128px;font-size:14px}
+ .xpbar{display:none}
+ #top .sp{display:none}
+ #tbtns{grid-template-columns:repeat(2,52px);gap:8px;bottom:92px}
+ #tbtns button{width:52px;height:52px;font-size:20px}
+ #joy{bottom:92px;width:110px;height:110px}
+ #knob{left:30px;top:30px}
+ #tabs{gap:3px;padding:4px;max-width:calc(100vw - 12px)}
+ #tabs button{min-width:0;flex:1;padding:4px 5px}
+ #dialog{bottom:84px}
+ .dtext{font-size:15px}
+}
+
+.more{background:#fff8e1;border:3px solid #ffe08a;border-radius:14px;padding:12px 14px;margin-top:12px;text-align:left;line-height:1.65;word-break:keep-all}
+.photo-btn{display:block;margin-top:12px;background:#03c75a;color:#fff;font-weight:900;text-decoration:none;border-radius:14px;padding:12px;text-align:center;box-shadow:0 4px 0 rgba(0,0,0,.18)}
+.realimg{display:block;width:100%;max-height:300px;object-fit:cover;border-radius:14px;margin-top:12px}
+
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud" hidden>
+  <div id="top">
+    <div class="chip" id="region">📍 <b id="rname"></b></div>
+    <div class="chip"><span class="lv">Lv.<b id="lv">1</b></span><div class="xpbar"><i id="xpfill"></i></div></div>
+    <div class="chip">🪙 <b id="coins">0</b></div>
+    <div class="chip">📖 도감 <b id="dexpct">0%</b></div>
+    <div class="chip" id="tidechip" hidden></div>
+    <div class="sp"></div>
+    <button class="ib" id="bMap" title="지도 (M)">🗺️</button>
+    <button class="ib" id="bHelp" title="도움말 (H)">❔</button>
+  </div>
+  <div id="quest">
+    <div class="qarrow" id="qArrow">➤</div>
+    <div style="flex:1"><div class="qt" id="qTitle"></div><div class="qh" id="qHint"></div></div>
+    <div class="qd" id="qDist"></div>
+  </div>
+  <canvas id="mini" width="360" height="280" title="크게 보기"></canvas>
+  <div id="prompt" hidden><kbd>E</kbd> <span id="promptText"></span></div>
+  <nav id="tabs">
+    <button data-m="missions" title="미션 (Q)">🎯<span>미션</span></button>
+    <button data-m="dex" title="도감 (Tab)">📖<span>도감</span></button>
+    <button id="bPhoto" title="사진 찍기 (C)">📷<span>사진</span></button>
+    <button data-m="album">🖼️<span>앨범</span></button>
+    <button data-m="closet">👕<span>옷장</span></button>
+    <button data-m="boss" id="bBoss">🦉<span>박사 시험</span></button>
+  </nav>
+  <div id="touch">
+    <div id="joy"><div id="knob"></div></div>
+    <div id="tbtns">
+      <button id="tIn">＋</button><button id="tOut">－</button>
+      <button id="tJump">⤒</button><button id="tAct">✋</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<div id="dialog" hidden>
+  <div class="dicon" id="dIcon"></div>
+  <div class="dbody"><div class="dwho" id="dWho"></div><div class="dtext" id="dText"></div><div class="dchoices" id="dChoices"></div></div>
+  <button id="dNext">다음 ▶</button>
+</div>
+
+<div id="modal" hidden><div class="mbox"><button class="mclose" id="mClose">✕</button><div id="mbody"></div></div></div>
+
+<div id="photoUI" hidden>
+  <div class="frame"></div>
+  <div class="hint">📸 찍고 싶은 곳을 네모 안에 넣고 셔터를 눌러요 (C)</div>
+  <button id="shutter">📸</button>
+  <button id="photoClose">✕</button>
+  <div id="flash"></div>
+</div>
+
+<div id="loading"><div class="sbox"><div class="bus">🚌</div><h1>탐험 지역을 만드는 중…</h1></div></div>
+
+<div id="start" hidden>
+  <div class="sbox">
+    <div class="logo" id="sLogo"></div>
+    <h1 id="sTitle"></h1>
+    <p class="sub" id="sSub"></p>
+    <input id="sName" maxlength="10" placeholder="탐험대원 이름을 적어요" autocomplete="off">
+    <div class="row" id="sBtns"></div>
+    <div class="how" id="sHow"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+const coast = [[980, 0], [930, 180], [860, 330], [880, 470], [820, 560], [860, 700], [800, 860], [840, 1020], [780, 1180], [820, 1320], [760, 1500], [800, 1660], [740, 1900]];
+const seaPoly = [[0, 0]].concat(coast, [[0, 1900]]);
+const mudPoly = coast.concat(coast.slice().reverse().map(p => [p[0] - 170, p[1]]));
+const houses = (list, c, roof) => list.map(p => ({ x: p[0], y: p[1], w: 46, h: 36, z: 22, c, roof, kind: 'house', win: false }));
+
+window.GAME = {
+  key: 'hwaseong-seobu-explorer-v1',
+  title: '서해 탐험대 – 화성 바다와 갯벌 도감을 완성하라!',
+  titleHTML: '서해 탐험대<br><span style="font-size:19px">화성 바다·갯벌 도감을 완성하라!</span>',
+  subtitle: '갯벌과 섬, 공룡알 화석지에서 포도밭과 항구까지, 화성 서쪽의 자연환경과 인문환경을 찾아요',
+  logo: '🧭🌊', regionName: '화성시 서부 (만세구)', color: '#2b9bd6', color2: '#9ad7f5', seed: 23,
+  world: { w: 2600, h: 1900, bg: 'grass', outside: '#3f9fd8' },
+  spawn: [2450, 1035],
+  tide: { low: 45, high: 30 },
+  mapNote: '화성 서쪽 바닷가를 탐험하기 좋게 단순하게 바꾼 지도예요. 장소 사이의 거리와 방향은 실제와 다를 수 있어요.',
+  howto: '<b>움직이기</b> 방향키·WASD (태블릿은 왼쪽 조이스틱) · Shift 달리기 · Space 점프<br><b>살펴보기</b> E 또는 ✋ — ❓ 표지판, 사람, 케이블카 승강장<br><b>도감</b> Tab · <b>미션</b> Q · <b>지도</b> M · <b>사진</b> C · <b>확대/축소</b> 마우스 휠, ＋/－<br>🌊 <b>밀물·썰물</b>: 썰물 때만 바닷길과 갯벌이 드러나요. 위쪽 시간을 확인해요!',
+  areas: [
+    { t: 'sea', poly: seaPoly },
+    { t: 'mud', poly: mudPoly },
+    { t: 'water', poly: [[980, 0], [2600, 0], [2600, 110], [2200, 150], [1800, 120], [1400, 160], [1000, 120]], label: '시화호', labelAt: [1900, 60] },
+    { t: 'reed', poly: [[1000, 120], [1400, 160], [1800, 120], [2200, 150], [2600, 110], [2600, 520], [1000, 520]], label: '시화호 간척지', labelAt: [1180, 470], lsize: 22 },
+    { t: 'mud', ell: [330, 760, 200, 230] },
+    { t: 'land', ell: [330, 760, 120, 150], label: '제부도', labelAt: [330, 885], lsize: 22 },
+    { t: 'hill', ell: [2050, 330, 170, 120], label: '우음도', labelAt: [2160, 230], lsize: 20 },
+    { t: 'plaza', rect: [1330, 300, 240, 110], c: '#e2cfa6' },
+    { t: 'plaza', rect: [860, 430, 170, 180], label: '전곡항', labelAt: [945, 420], lsize: 20 },
+    { t: 'plaza', rect: [800, 1190, 200, 150], label: '궁평항', labelAt: [900, 1180], lsize: 20 },
+    { t: 'vine', rect: [1250, 600, 450, 300], label: '송산 포도밭', labelAt: [1475, 750] },
+    { t: 'field', rect: [1300, 1100, 620, 320], label: '수향미 논', labelAt: [1610, 1260] },
+    { t: 'reed', ell: [1150, 1720, 340, 180] },
+    { t: 'water', ell: [1150, 1730, 250, 120], label: '화성호', labelAt: [1150, 1730] }
+  ],
+  labels: [[330, 330, '서해', 44], [620, 1610, '매향리 갯벌', 20], [700, 1090, '갯벌', 22]],
+  roads: [
+    { pts: [[2600, 980], [2000, 980], [1200, 1000], [1060, 900], [1000, 650], [960, 600]], w: 34 },
+    { pts: [[1200, 1000], [1080, 1150], [1000, 1260]], w: 30 },
+    { pts: [[1700, 985], [1700, 560], [1500, 420]], w: 30 },
+    { pts: [[1700, 560], [1980, 430]], w: 24 },
+    { pts: [[2000, 980], [2280, 1440]], w: 28 },
+    { pts: [[1080, 1150], [1120, 1500]], w: 24 },
+    { pts: [[845, 790], [440, 770]], w: 30, tide: true, label: '제부도 바닷길', labelAt: [640, 745] },
+    { pts: [[870, 500], [730, 470]], w: 22, kind: 'pier' },
+    { pts: [[815, 1250], [645, 1240]], w: 22, kind: 'pier' },
+    { pts: [[440, 770], [330, 760], [300, 668]], w: 18, kind: 'path' }
+  ],
+  buildings: [
+    { x: 1340, y: 225, w: 150, h: 65, z: 30, c: '#e8d7b0', label: '공룡알화석산지 방문자센터' },
+    { x: 2030, y: 270, w: 44, h: 40, z: 80, c: '#d0d8e0', kind: 'tower', roof: '#6c8fb3', label: '송산그린시티 전망대' },
+    { x: 900, y: 440, w: 100, h: 55, z: 34, c: '#ffffff', kind: 'glass', label: '마리나 클럽하우스' },
+    { x: 930, y: 618, w: 60, h: 40, z: 30, c: '#ffd9c9', label: '케이블카 승강장' },
+    { x: 395, y: 638, w: 50, h: 36, z: 26, c: '#ffd9c9', label: '제부도 승강장' },
+    { x: 285, y: 616, w: 26, h: 22, z: 60, c: '#e8463c', kind: 'tower', roof: '#b32e26', label: '빨간 등대' },
+    { x: 880, y: 1195, w: 110, h: 60, z: 30, c: '#cfe7f5', label: '궁평항 수산물 시장' },
+    { x: 1560, y: 918, w: 60, h: 40, z: 26, c: '#f3e3c3', roof: '#7a4fa0', kind: 'house', win: false },
+    { x: 2300, y: 1460, w: 150, h: 80, z: 34, c: '#e9e2d0', roof: '#7d6b5d', label: '제암리 3·1운동 순국기념관' }
+  ].concat(houses([[900, 1060], [960, 1100], [890, 1120]], '#f2efe6', '#3f7fbf'), houses([[1960, 1120], [2020, 1170], [1975, 1235]], '#f6eedc', '#c0563f')),
+  forests: [
+    { ell: [330, 745, 105, 125], n: 22 },
+    { ell: [2050, 330, 150, 100], n: 12 },
+    { rect: [860, 1345, 200, 130], n: 14, kind: 'pine' },
+    { rect: [1750, 620, 700, 300], n: 26 },
+    { rect: [2080, 1100, 470, 720], n: 34 },
+    { rect: [1040, 560, 190, 330], n: 10 },
+    { rect: [1300, 1440, 700, 420], n: 24 }
+  ],
+  decor: [[760, 430, '⛵', 1, 30], [735, 525, '⛵', 1, 28], [700, 460, '🚤', 1, 24], [690, 1290, '🛥️', 1, 28], [720, 1195, '🛥️', 1, 26], [600, 980, '🦀', 1, 20], [680, 1420, '🐚', 0, 18], [1525, 330, '🦕', 0, 40], [430, 520, '🐦', 1, 20], [1290, 1680, '🦆', 1, 22], [200, 1300, '🐟', 1, 22]],
+  pois: [
+    { id: 'p_vine', x: 1450, y: 942, icon: '🍇', name: '송산 포도밭', dex: 'vine' },
+    { id: 'p_wind', x: 1290, y: 568, icon: '🎐', name: '바람개비 언덕', dex: 'wind' },
+    { id: 'p_reclaim', x: 1770, y: 468, icon: '🚜', name: '넓은 들판', dex: 'reclaim' },
+    { id: 'p_egg', x: 1450, y: 360, icon: '🥚', name: '공룡알 화석산지', dex: 'egg', quiz: { q: '이곳의 공룡알 화석은 언제 살았던 공룡의 알일까요?', o: ['약 1억 년 전 중생대 백악기', '약 500년 전 조선 시대', '약 1만 년 전 빙하기', '작년 여름'], a: 0, exp: '약 1억 년 전 백악기 공룡의 알이에요. 이곳에서 200개가 넘는 공룡알 화석이 발견되었어요.', hint: '해설사님의 이야기를 떠올려 봐요.' } },
+    { id: 'p_uumdo', x: 2120, y: 395, icon: '🪨', name: '우음도 바위', dex: 'uumdo' },
+    { id: 'p_tuff', x: 905, y: 375, icon: '🌋', name: '바닷가 바위층', dex: 'tuff' },
+    { id: 'p_jeongok', x: 955, y: 560, icon: '⛵', name: '전곡항', dex: 'jeongok' },
+    { id: 'p_cable', x: 1045, y: 668, icon: '🚡', name: '해상케이블카', dex: 'cable' },
+    { id: 'p_jebu', x: 330, y: 790, icon: '🏝️', name: '제부도', dex: 'jebu' },
+    { id: 'p_lighthouse', x: 300, y: 672, icon: '🗼', name: '빨간 등대', dex: 'lighthouse' },
+    { id: 'p_tide', x: 885, y: 828, icon: '🌊', name: '바닷길 입구 안내판', dex: 'tide' },
+    { id: 'p_mud', x: 850, y: 1560, icon: '🦀', name: '갯벌 관찰 데크', dex: 'mudflat' },
+    { id: 'p_maehyang', x: 825, y: 1765, icon: '📋', name: '매향리 갯벌 안내판', showName: true, quiz: { q: '매향리 갯벌은 2021년에 무엇으로 지정되었을까요?', o: ['습지보호지역', '공업 단지', '공항', '놀이공원'], a: 0, exp: '여러 생물이 살아 보전할 가치가 높아 습지보호지역이 되었어요. 오랫동안 폭격 훈련장으로 쓰였던 곳이 생명이 사는 갯벌로 되살아났어요.' } },
+    { id: 'p_bird', x: 1000, y: 1605, icon: '🐦', name: '화성호 갈대밭', dex: 'bird' },
+    { id: 'p_gungpyeong', x: 935, y: 1305, icon: '🐟', name: '궁평항', dex: 'gungpyeong' },
+    { id: 'p_sunset', x: 665, y: 1240, icon: '🌅', name: '피싱피어 끝', showName: true, look: [470, 1240], lookIcon: '🌅', info: '궁평항은 서해로 해가 지는 모습(궁평낙조)이 아름답기로 유명해요. 서해안은 서쪽이 바다라 바다 위로 지는 해를 볼 수 있어요.', photoHint: '📷 사진 버튼을 누르고 바다 쪽 🌅을 네모 안에 넣어 찍어 보세요!' },
+    { id: 'p_paddy', x: 1600, y: 1445, icon: '🌾', name: '수향미 논', dex: 'paddy' },
+    { id: 'p_village', x: 945, y: 1175, icon: '🏘️', name: '어촌 마을', dex: 'village' },
+    { id: 'p_jeam', x: 2375, y: 1568, icon: '🕊️', name: '제암리 3·1운동 순국기념관', dex: 'jeam' }
+  ],
+  dex: [
+    { id: 'mudflat', type: 'N', icon: '🦀', name: '갯벌', desc: '바닷물이 빠지면 드러나는 넓은 진흙 땅이에요. 화성 서해안에는 갯벌이 넓게 펼쳐져 있고, 게·조개·갯지렁이 같은 생물이 많이 살아요.', why: '바닷물과 흙이 오랜 시간 만든 땅이라 자연환경이에요.' },
+    { id: 'tide', type: 'N', icon: '🌊', name: '밀물과 썰물', desc: '바닷물은 하루에 두 번씩 들어왔다(밀물) 빠졌다(썰물) 해요. 제부도 바닷길은 썰물 때만 열려서, 통행 시간표를 꼭 확인하고 건너야 해요.', why: '달과 해가 바닷물을 끌어당겨 생기는 자연 현상이라 자연환경이에요.' },
+    { id: 'jebu', type: 'N', icon: '🏝️', name: '제부도', desc: '서신면 앞바다의 작은 섬이에요(약 0.98㎢). 썰물이면 하루 두 번 바닷길이 열려 섬에 들어갈 수 있어서 「모세의 기적」이라고도 불러요.', why: '섬은 자연이 만든 땅이라 자연환경이에요. 섬으로 가는 바닷길 도로는 사람이 만든 인문환경이고요!' },
+    { id: 'egg', type: 'N', icon: '🥚', name: '공룡알 화석', desc: '약 1억 년 전 중생대 백악기 공룡이 낳은 알이 돌처럼 굳은 화석이에요. 1999년 시화호 간척지에서 발견되었고, 2000년에 천연기념물로 지정되었어요.', why: '아주 오랜 옛날 자연이 남긴 흔적이라 자연환경(자연유산)이에요.' },
+    { id: 'uumdo', type: 'N', icon: '🪨', name: '우음도의 바위와 지층', desc: '우음도에서는 땅이 휘어진 습곡, 끊어진 단층 같은 지층을 한곳에서 볼 수 있어 「지질학 교과서」라고 불려요. 예전에는 섬이었지만 간척으로 육지와 이어졌어요.', why: '땅이 오랜 시간 스스로 만든 모습이라 자연환경이에요.' },
+    { id: 'tuff', type: 'N', icon: '🌋', name: '전곡항 층상응회암', desc: '아주 오래전 화산재가 층층이 쌓여 굳은 바위예요. 화성 국가지질공원의 지질명소 8곳 가운데 하나예요.', why: '자연이 만든 바위라 자연환경이에요.' },
+    { id: 'wind', type: 'N', icon: '🎐', name: '해풍(바닷바람)', desc: '바다에서 불어오는 바람이에요. 서해안의 풍부한 햇빛과 해풍은 송산포도가 달게 익는 데 도움을 줘요.', why: '바람과 햇빛은 사람이 만들 수 없는 자연환경이에요.' },
+    { id: 'bird', type: 'N', icon: '🐦', name: '철새(저어새)', desc: '화성호와 매향리 갯벌 일대는 철새들이 쉬어 가는 곳이에요. 멸종위기 새인 저어새도 찾아와요.', why: '새와 같은 생물은 자연환경이에요.' },
+    { id: 'vine', type: 'H', icon: '🍇', name: '송산 포도밭', desc: '1980년대 후반, 시화방조제를 만들며 생긴 간척지에서 포도를 기르기 시작했어요. 2015년에는 전국 최초로 「노지 포도 스마트팜」을 도입해 스마트폰으로 물 주기와 환기를 조절해요.', why: '사람이 땅을 일구어 만든 밭이라 인문환경이에요.' },
+    { id: 'reclaim', type: 'H', icon: '🚜', name: '간척지', desc: '바다나 갯벌을 둑(방조제)으로 막아 만든 땅이에요. 1994년 시화호 방조제가 생긴 뒤, 이곳의 갯벌은 드넓은 들판이 되었어요.', why: '사람이 바다를 막아 새로 만든 땅이라 인문환경이에요.' },
+    { id: 'jeongok', type: 'H', icon: '⛵', name: '전곡항', desc: '요트와 보트가 머무는 마리나 시설이 있는 항구예요. 전국 최초로 레저 어항 시범지역으로 선정되었고, 방파제 덕분에 밀물·썰물과 상관없이 배가 드나들 수 있어요.', why: '사람이 배를 대고 바다를 즐기려고 만든 항구라 인문환경이에요.' },
+    { id: 'cable', type: 'H', icon: '🚡', name: '해상케이블카', desc: '전곡항에서 제부도까지 바다 위 약 2.12km를 10분 남짓 날아가는 케이블카예요.', why: '바다를 건너려고 사람이 만든 교통 시설이라 인문환경이에요.' },
+    { id: 'gungpyeong', type: 'H', icon: '🐟', name: '궁평항', desc: '2008년 국가 어항으로 지정된 항구예요. 고깃배가 드나들고 수산물 시장이 있으며, 바다로 지는 노을(궁평낙조)로 유명해요.', why: '사람이 배를 대려고 만든 항구라 인문환경이에요.' },
+    { id: 'village', type: 'H', icon: '🏘️', name: '어촌 마을', desc: '바닷가에 모여 사는 마을이에요. 고기잡이, 조개 캐기처럼 바다와 갯벌을 이용해 살아가는 사람이 많아요.', why: '사람이 모여 사는 마을이라 인문환경이에요.' },
+    { id: 'paddy', type: 'H', icon: '🌾', name: '수향미 논', desc: '평평한 땅에 물을 대어 벼를 기르는 논이에요. 화성의 대표 쌀로 「수향미」가 있어요.', why: '사람이 농사를 지으려고 만든 논이라 인문환경이에요.' },
+    { id: 'lighthouse', type: 'H', icon: '🗼', name: '빨간 등대', desc: '제부도를 대표하는 풍경인 빨간 등대예요. 등대는 밤에 불빛을 비춰 배가 안전하게 다니도록 도와요.', why: '사람이 배의 안전을 위해 세운 시설이라 인문환경이에요.' },
+    { id: 'jeam', type: 'H', icon: '🕊️', name: '제암리 3·1운동 순국기념관', desc: '1919년 3·1운동 때 독립을 외친 사람들과 그 희생을 기억하는 곳이에요. 화성 사람들의 독립운동 정신을 배울 수 있어요.', why: '역사를 기억하려고 사람이 만든 곳이라 인문환경이에요.' }
+  ],
+  npcs: [
+    { id: 'cap', x: 2390, y: 1035, icon: '🧭', name: '바다 대장', color: '#2b9bd6', hat: 'explorer',
+      lines: ['반가워, {name} 대원! 나는 서해 탐험대장 바다야.', '여기는 화성의 서쪽, 바다와 갯벌, 포도밭과 논이 있는 곳이야. 아파트가 많은 동탄과는 모습이 많이 다르지?', '바다·갯벌·섬 같은 🌿자연환경과 항구·포도밭·간척지 같은 🏙️인문환경을 찾아 도감을 채워 줘!', '위쪽 🌊 시간도 잘 봐. 밀물이 되면 바닷길과 갯벌이 물에 잠겨!', '먼저 큰길을 따라 서쪽 송산 포도밭의 농부님을 찾아가 봐.'],
+      after: ['미션 카드의 화살표(➤)를 따라가면 돼!', '모든 미션을 끝내면 🦉 서해 환경 박사님의 시험을 볼 수 있어.'] },
+    { id: 'farmer', x: 1660, y: 945, icon: '👨‍🌾', name: '포도 농부', color: '#7a4fa0', hat: 'straw',
+      lines: ['어서 와요! 여기는 송산 포도밭이에요.', '이 땅은 원래 바다와 갯벌이었는데, 사람들이 바다를 막아 땅을 만들었어요. 그런 땅을 간척지라고 해요.', '바다에서 불어오는 바람(해풍)과 풍부한 햇빛 덕분에 포도가 달게 익는답니다.', '요즘은 스마트폰으로 물 주기와 환기를 조절하는 스마트팜도 써요. 포도밭 ❓도 살펴보세요!'],
+      after: ['포도밭 북서쪽 바람개비 언덕에 가면 바닷바람을 느낄 수 있어요.'] },
+    { id: 'guide', x: 1535, y: 372, icon: '🧑‍🏫', name: '지질공원 해설사', color: '#c98a3a', hat: 'beret',
+      lines: ['여기는 공룡알 화석산지예요. 화성은 2024년에 국가지질공원으로 인증받았어요.', '시화호에 방조제를 쌓아 바닷물이 빠지자, 1억 년 전 공룡알이 세상에 드러났답니다.', '화석은 소중한 자연유산이니 눈으로만 보고 만지지 않아요!'] },
+    { id: 'captain', x: 1000, y: 525, icon: '🧑‍✈️', name: '요트 선장', color: '#2c3e70', hat: 'cap',
+      lines: ['어이, 탐험대원! 전곡항에 온 걸 환영하네.', '이 항구는 방파제 덕분에 밀물·썰물과 상관없이 배가 드나들 수 있지. 요트도 많이 머문다네.', '남쪽 승강장에서 해상케이블카를 타면 제부도까지 금방이야!'] },
+    { id: 'resident', x: 365, y: 830, icon: '👵', name: '제부도 주민', color: '#e6a23c', hair: '#ddd',
+      lines: ['제부도에 온 걸 환영해요. 이 섬은 썰물 때 하루 두 번 바닷길이 열려요.', '물때를 모르고 들어왔다가 길이 잠겨 못 나가는 사람도 있어요. 시간표를 꼭 확인해야 해요!', '썰물이 되면 바닷길로 걸어서 육지로 나가 보세요.'] },
+    { id: 'safety', x: 905, y: 770, icon: '🦺', name: '바닷길 안전요원', color: '#ff8a3d', hat: 'helmet',
+      lines: ['바닷길 안전요원입니다! 바닷길은 썰물 때만 건널 수 있어요.', '밀물이 시작되면 물이 금방 차오르니, 위쪽 🌊 남은 시간을 꼭 확인하세요.'] },
+    { id: 'fisher', x: 1005, y: 1300, icon: '🧔', name: '궁평항 어민', color: '#4c7cf0', hat: 'cap',
+      lines: ['궁평항에 잘 왔어! 여기서 잡은 싱싱한 해산물을 수산물 시장에서 팔지.', '바다와 갯벌 덕분에 이 마을 사람들은 고기잡이와 조개 캐기로 살아간단다.', '피싱피어 끝에 가면 서해로 지는 노을이 정말 멋져. 사진 한 장 꼭 찍어 가!'] },
+    { id: 'birder', x: 1065, y: 1585, icon: '🔭', name: '탐조가', color: '#5aa64e', hat: 'explorer',
+      lines: ['쉿! 조용히… 새들이 놀라지 않게 해 줘.', '화성호와 매향리 갯벌에는 철새가 많이 찾아와. 저어새 같은 멸종위기 새도 볼 수 있지.', '갯벌이 깨끗해야 새들의 먹이도 많아진단다. 옆의 ❓도 살펴보렴.'] },
+    { id: 'pfarmer', x: 1665, y: 1455, icon: '👩‍🌾', name: '논 농부', color: '#3fae5a', hat: 'straw',
+      lines: ['이 넓은 논에서 화성의 쌀, 수향미를 길러요.', '평평한 땅과 물을 이용해 벼농사를 짓는 거예요. 논도 사람이 만든 인문환경이죠!'] }
+  ],
+  items: [{ group: 'trash', icon: '🧴', name: '갯벌 쓰레기를 주웠어요', tide: true, pts: [[700, 1480], [665, 1560], [720, 1640], [660, 1705], [700, 1785], [650, 1845], [640, 1420]] }],
+  rides: [{ id: 'cable', name: '서해랑 해상케이블카', icon: '🚡', mode: 'cable', dur: 7, stations: ['전곡항 승강장', '제부도 승강장'], path: [[960, 690], [420, 700]], arrive: '바다 위를 건넜어요', after: ['제부도에 도착! 섬 가운데 ❓를 살펴보고, 썰물 때 바닷길로 걸어 나가 보세요.'] }],
+  missions: [
+    { id: 'm1', main: 1, kind: 'talk', target: 'cap', title: '서해 대장 바다 만나기', hint: '버스에서 내린 곳 옆 대장에게 E(✋)를 눌러요.', xp: 30 },
+    { id: 'm2', main: 1, kind: 'talk', target: 'farmer', title: '포도 농부 이야기 듣기', hint: '큰길을 따라 서쪽 송산 포도밭으로 가요.' },
+    { id: 'm3', main: 1, kind: 'dex', target: 'vine', title: '송산 포도밭 살펴보기', hint: '포도밭 아래쪽 ❓를 살펴봐요.' },
+    { id: 'm4', main: 1, kind: 'dex', target: 'wind', title: '바닷바람 느끼기', hint: '포도밭 북서쪽 바람개비 언덕 ❓를 찾아요.' },
+    { id: 'm5', main: 1, kind: 'quiz', target: 'p_egg', title: '공룡알 화석의 비밀', hint: '북쪽 시화호 간척지의 공룡알 화석산지로 가요.' },
+    { id: 'm6', main: 1, kind: 'dex', target: 'reclaim', title: '간척지 알아보기', hint: '화석산지 동쪽 넓은 들판의 ❓를 살펴봐요.' },
+    { id: 'm7', main: 1, kind: 'talk', target: 'captain', title: '전곡항 요트 선장 만나기', hint: '서쪽 바닷가 전곡항으로 가요.' },
+    { id: 'm8', main: 1, kind: 'ride', target: 'cable', title: '해상케이블카 타고 제부도 가기', hint: '전곡항 남쪽 케이블카 승강장 앞에서 E를 눌러요.', xp: 60 },
+    { id: 'm9', main: 1, kind: 'dex', target: 'jebu', title: '제부도 살펴보기', hint: '섬 가운데 ❓를 살펴봐요.' },
+    { id: 'm10', main: 1, kind: 'reach', target: [600, 777], r: 45, cond: 'low', title: '썰물 때 바닷길 걷기', hint: '🏖️썰물일 때 바닷길 한가운데까지 걸어가요! (밀물이면 기다려요)', xp: 70 },
+    { id: 'm11', main: 1, kind: 'dex', target: 'tide', title: '밀물과 썰물 알아보기', hint: '육지 쪽 바닷길 입구 안내판 ❓를 살펴봐요.' },
+    { id: 'm12', main: 1, kind: 'count', target: 'trash', n: 5, title: '매향리 갯벌 지키기', hint: '남쪽 매향리 갯벌의 🧴 쓰레기를 5개 주워요. 썰물일 때만 갯벌에 들어갈 수 있어요!', xp: 70 },
+    { id: 'm13', main: 1, kind: 'dex', target: 'bird', title: '화성호 철새 찾기', hint: '화성호 둘레 갈대밭에서 탐조가와 ❓를 찾아요.' },
+    { id: 'm14', main: 1, kind: 'photo', target: 'p_sunset', title: '궁평항 노을 사진 찍기', hint: '궁평항 피싱피어 끝에서 📷 사진 버튼(C)을 누르고 바다 쪽 🌅을 찍어요.', xp: 60 },
+    { id: 'm15', main: 1, kind: 'dexAll', n: 6, h: 7, title: '환경 도감 채우기', hint: '❓ 장소를 더 찾아 자연환경 6개, 인문환경 7개를 모아요.', xp: 100, coin: 50 },
+    { id: 's1', kind: 'dex', target: 'jeam', title: '제암리 기념관 찾기', hint: '동남쪽 길 끝으로 가 봐요.' },
+    { id: 's2', kind: 'quiz', target: 'p_maehyang', title: '매향리 갯벌 안내판 읽기', hint: '매향리 갯벌 남쪽 안내판을 찾아요.' },
+    { id: 's3', kind: 'dex', target: 'uumdo', title: '우음도 지층 관찰하기', hint: '북동쪽 우음도로 가요.' },
+    { id: 's4', kind: 'dex', target: 'lighthouse', title: '빨간 등대 찾기', hint: '제부도 북쪽 끝을 살펴봐요.' },
+    { id: 's5', kind: 'dex', target: 'tuff', title: '바닷가 바위층 관찰하기', hint: '전곡항 북쪽 바닷가를 살펴봐요.' }
+  ],
+  intro: [
+    { who: '바다 대장', icon: '🧭', text: '{name} 대원, 서해 탐험대에 온 걸 환영해! 🌊' },
+    { who: '바다 대장', icon: '🧭', text: '버스를 타고 화성의 서쪽, 바닷가 마을에 도착했어. 이곳의 환경 도감이 텅 비어 버렸대!' },
+    { who: '바다 대장', icon: '🧭', text: '방향키(WASD)나 조이스틱으로 움직이고, E나 ✋로 살펴봐. 먼저 내 앞으로 와서 말을 걸어 줘!' }
+  ],
+  bossIntro: [
+    { who: '바다 대장', icon: '🧭', text: '해냈구나, {name} 대원! 모든 미션을 끝냈어! 🎉' },
+    { who: '바다 대장', icon: '🧭', text: '이제 아래 🦉 박사 시험 버튼을 눌러 서해 환경 박사님께 도전해 봐!' }
+  ],
+  boss: {
+    name: '서해 환경 박사 부엉이',
+    intro: '바다와 갯벌, 섬과 들판을 모두 다녀왔다면 내 문제를 풀 수 있을 거야! 자연환경에 따라 사람들의 생활이 어떻게 달라지는지도 생각해 보렴.',
+    q: [
+      { q: '썰물 때 하루 두 번 바닷길이 열리는 화성의 섬은?', o: ['제부도', '독도', '제주도', '울릉도'], a: 0, exp: '제부도는 썰물 때 바닷길이 열려 「모세의 기적」이라고 불려요.' },
+      { q: '바닷물이 빠졌을 때 드러나는 넓은 진흙 땅은?', o: ['갯벌', '사막', '빙하', '화산'], a: 0, exp: '갯벌에는 게, 조개, 갯지렁이 같은 생물이 많이 살아요.' },
+      { q: '공룡알 화석은 언제 살았던 공룡의 알일까요?', o: ['약 1억 년 전 중생대 백악기', '약 500년 전 조선 시대', '약 1만 년 전 빙하기', '약 10년 전'], a: 0, exp: '약 1억 년 전 백악기 공룡의 알이에요.' },
+      { q: '송산포도가 달게 익는 데 도움을 주는 자연환경은?', o: ['풍부한 햇빛과 바닷바람', '눈과 얼음', '높은 산의 추위', '사막의 모래바람'], a: 0, exp: '서해안의 햇빛과 해풍이 포도를 달게 만들어요.' },
+      { q: '시화호 간척지는 어떤 환경일까요?', o: ['사람이 바다를 막아 만든 인문환경', '저절로 생긴 자연환경', '화산이 만든 섬', '빙하가 만든 호수'], a: 0, exp: '방조제로 바다를 막아 만든 땅이라 인문환경이에요.' },
+      { q: '요트가 머무는 마리나 시설이 있고, 케이블카로 제부도와 이어진 항구는?', o: ['전곡항', '부산항', '인천항', '목포항'], a: 0, exp: '전곡항에는 마리나 시설이 있고, 해상케이블카로 제부도까지 갈 수 있어요.' },
+      { q: '화성시가 2024년에 받은 인증은 무엇일까요?', o: ['국가지질공원', '세계 사막 공원', '국립 스키장', '우주 기지'], a: 0, exp: '공룡알 화석산지, 우음도, 제부도 등 8곳의 지질명소가 있는 국가지질공원이에요.' },
+      { q: '동탄과 비교할 때, 서부 화성 바닷가 사람들이 더 많이 하는 일은?', o: ['농사짓기와 고기잡이', '지하철 운전', '높은 빌딩 짓기', '스키 강사'], a: 0, exp: '바다·갯벌·평평한 땅을 이용해 농업과 어업을 하는 사람이 많아요. 자연환경에 따라 생활 모습이 달라져요.' }
+    ]
+  },
+  certTitle: '서해 환경 박사 인증서',
+  certText: '위 대원은 화성 서부의 바다와 갯벌, 섬과 들판을 탐험하고 환경 도감을 채워, 자연환경과 인문환경을 잘 아는 「서해 환경 박사」임을 인정합니다.'
+};
+})();
+
+(function(){
+const X = {
+ mudflat:{photoQ:'화성 매향리 갯벌',more:'매향리 갯벌에는 갯벌 속이나 위에 사는 큰 동물(대형 저서동물)이 169종 살고, 칠면초 같은 염생식물이 자라요. 갯벌은 물고기와 새에게 먹이를 주는 생물의 집이에요.',quiz:{q:'갯벌이 하는 일로 알맞은 것은?',o:['게·조개 같은 생물의 집이 된다','기차를 달리게 한다','높은 산을 만든다','눈을 내리게 한다'],a:0,exp:'갯벌에는 수많은 생물이 살고, 새들이 먹이를 찾아와요.'}},
+ tide:{photoQ:'제부도 바닷길 물때',more:'제부도 바닷길 통행 시간표는 국립해양조사원의 조석 예보를 바탕으로 화성시가 만들어요. 날씨에 따라 실제 물때가 30분 넘게 달라질 수 있어 현장 안내판도 꼭 확인해야 해요.',quiz:{q:'제부도 바닷길을 건너기 전에 꼭 확인해야 할 것은?',o:['바닷길 통행 시간표(물때)','버스 노선표','기차 시간표','도서관 여는 시간'],a:0,exp:'물때를 모르면 바닷길이 잠겨 섬에서 나오지 못할 수 있어요.'}},
+ jebu:{photoQ:'제부도',more:'제부도라는 이름은 「어린아이는 업고 노인은 부축해서 갯벌 고랑을 건넌다(제약부경)」는 말에서 왔다고 전해져요. 해마다 200만 명이 넘는 관광객이 찾아와요.',quiz:{q:'제부도 바닷길이 열리는 때는?',o:['썰물 때','밀물 때','눈이 올 때','한밤중에만'],a:0,exp:'바닷물이 빠지는 썰물 때 바닷길이 드러나요.'}},
+ egg:{photoQ:'화성 공룡알 화석산지',more:'12개 지점에서 둥지 30여 개와 알 200여 개가 나왔고, 그 뒤 조사까지 더하면 300개가 넘어요. 2008년에는 전곡항 방조제 근처에서 우리나라 첫 뿔공룡 화석 「코리아케라톱스 화성엔시스」도 발견되었어요.'},
+ uumdo:{photoQ:'화성 우음도',more:'우음도는 섬 모양이 소를 닮았거나, 육지까지 소 울음소리가 들려서 붙은 이름이라고 해요. 높이 40m의 송산그린시티 전망대에 오르면 시화호 일대가 한눈에 보여요.',quiz:{q:'우음도가 「지질학 교과서」라고 불리는 까닭은?',o:['습곡·단층 같은 지층을 한곳에서 볼 수 있어서','학교가 많아서','책을 많이 팔아서','도서관이 있어서'],a:0,exp:'여러 지질 구조를 한곳에서 볼 수 있어 그렇게 불려요.'}},
+ tuff:{photoQ:'전곡항 층상응회암',more:'물때 때문에 가까이 가기 어려웠던 층상응회암을 볼 수 있도록, 화성시는 바다 위로 총 526m 길이의 해상 관찰로를 만드는 사업을 추진했어요.',quiz:{q:'응회암은 무엇이 쌓여 굳은 바위일까요?',o:['화산재','눈','플라스틱','설탕'],a:0,exp:'응회암은 화산이 터질 때 나온 화산재가 쌓여 굳은 바위예요.'}},
+ wind:{photoQ:'송산포도',more:'서해안은 바다와 가까워 바람이 자주 불어요. 바닷바람은 농작물이 잘 자라는 데 도움을 주기도 하지만, 태풍 때는 큰 피해를 주기도 해요.',quiz:{q:'다음 중 사람이 만들 수 없는 자연환경은?',o:['바닷바람','포도밭','항구','케이블카'],a:0,exp:'바람은 자연환경이고, 나머지는 사람이 만든 인문환경이에요.'}},
+ bird:{photoQ:'화성호 저어새',more:'화성습지(매향리 갯벌·화성호 일대)에서는 2015~2016년 조사에서 새 약 44종, 최대 약 9만 7천 마리가 관찰되었어요. 2018년에는 국제 철새 보호 네트워크(EAAFP)의 철새 서식지로 등재되었어요.',quiz:{q:'철새가 화성호와 갯벌에 많이 모이는 까닭은?',o:['먹이가 많은 갯벌과 습지가 있어서','높은 빌딩이 많아서','기차역이 있어서','눈이 많이 와서'],a:0,exp:'갯벌과 습지에는 새들의 먹이가 풍부해요.'}},
+ vine:{photoQ:'송산포도',more:'지금 화성에서는 70개 농가가 스마트팜을 활용하고 있어요. 해마다 화성송산포도축제가 열리고, 2026년에는 9월 5~6일에 제12회 축제가 열렸어요.',quiz:{q:'송산포도를 처음 기르기 시작한 땅은?',o:['바다를 막아 만든 간척지','높은 산꼭대기','사막','빙하'],a:0,exp:'1980년대 후반 시화방조제로 생긴 간척지에서 포도를 기르기 시작했어요.'}},
+ reclaim:{photoQ:'시화호 간척지 송산',more:'간척지가 생기자 바닷물을 좋아하는 염생식물이 자라던 땅이 점점 육지 식물이 자라는 땅으로 바뀌고 있어요. 바닷물이 빠지면서 공룡알 화석이 발견되기도 했어요.',quiz:{q:'간척지를 만들려고 바다를 막아 쌓는 둑의 이름은?',o:['방조제','터널','다리','등대'],a:0,exp:'바닷물을 막는 둑을 방조제라고 해요.'}},
+ jeongok:{photoQ:'전곡항 마리나',more:'서신면과 안산 대부도를 잇는 방파제가 바로 옆에 있어 24시간 배가 드나들 수 있어요. 파도가 적고 수심이 3m 넘게 유지돼 수상 레저에 알맞아요. 해마다 5월 말~6월 초에 화성 뱃놀이 축제가 열려요.',quiz:{q:'해마다 전곡항에서 열리는 축제는?',o:['화성 뱃놀이 축제','눈꽃 축제','벚꽃 축제','단풍 축제'],a:0,exp:'바다를 이용하는 항구답게 뱃놀이 축제가 열려요.'}},
+ cable:{photoQ:'서해랑 제부도 해상케이블카',more:'케이블카를 타면 바다 위에서 제부도 바닷길과 갯벌을 내려다볼 수 있어요. 밀물 때에도 제부도에 갈 수 있는 또 하나의 방법이에요.',quiz:{q:'해상케이블카가 잇는 두 곳은?',o:['전곡항과 제부도','동탄역과 수서역','궁평항과 우음도','화성호와 시화호'],a:0,exp:'전곡항에서 제부도까지 바다 위를 건너요.'}},
+ gungpyeong:{photoQ:'궁평항 낙조',more:'궁평항에는 낚시를 즐기는 다리(피싱피어)와 해안을 따라 걷는 나무 데크 산책로가 있어요. 궁평항의 노을(궁평낙조)은 화성 8경 가운데 하나이고, 2025년에는 화성송산포도축제가 이곳에서 열렸어요.',quiz:{q:'궁평항에서 바다로 해가 지는 모습을 볼 수 있는 까닭은?',o:['바다가 서쪽에 있어서','바다가 동쪽에 있어서','산이 높아서','밤이 길어서'],a:0,exp:'해는 서쪽으로 지는데, 서해안은 서쪽이 바다예요.'}},
+ village:{photoQ:'궁평항 어촌',more:'어촌 사람들은 바닷물이 빠지는 때에 맞춰 갯벌에 나가고, 물이 들어오면 배를 띄워요. 어촌의 생활은 밀물과 썰물 같은 자연환경에 맞춰 이루어져요.',quiz:{q:'어촌 사람들이 갯벌에 나가 일하기 좋은 때는?',o:['썰물 때','밀물 때','태풍이 올 때','한밤중'],a:0,exp:'바닷물이 빠진 썰물 때 갯벌이 드러나요.'}},
+ paddy:{photoQ:'화성 수향미 논',more:'화성시는 수도권에서 가장 큰 농업 도시로 소개돼요. 넓고 평평한 들과 물을 이용해 벼농사를 짓고, 대표 쌀 「수향미」를 길러요.',quiz:{q:'논농사를 짓기에 알맞은 땅은?',o:['넓고 평평하며 물을 대기 좋은 땅','가파른 바위산','바닷속','모래사막'],a:0,exp:'벼는 물을 댄 평평한 논에서 잘 자라요.'}},
+ lighthouse:{photoQ:'제부도 빨간 등대',more:'제부도의 빨간 등대는 해돋이와 함께 사진을 찍는 명소이기도 해요.',quiz:{q:'등대가 하는 일은?',o:['밤에 불빛을 비춰 배의 길을 알려 준다','포도를 기른다','기차를 멈춘다','비를 내리게 한다'],a:0,exp:'등대 불빛은 배가 안전하게 다니도록 도와요.'}},
+ jeam:{name:'화성시독립운동기념관',photoQ:'화성시독립운동기념관',desc:'일제강점기 화성 사람들의 독립운동과 그 정신을 기억하는 기념관이에요. 원래 있던 「제암리3·1운동 순국기념관」을 넓혀 옮겨 2024년 4월 15일에 문을 열었어요.',more:'1919년 화성에서도 만세 운동이 크게 일어났어요. 그해 4월 15일 일본군은 제암리와 고주리 마을 사람 29명을 희생시켰어요. 이 일이 일어난 곳은 1982년 국가 사적으로 지정되었고, 해마다 4월 15일에 추모제가 열려요. 기념관에는 어린이 전시실도 있어요.',quiz:{q:'화성시독립운동기념관에서 기억하고 배우는 것은?',o:['화성 사람들의 독립운동 정신','공룡이 살던 모습','포도 기르는 법','요트 타는 법'],a:0,exp:'평범한 화성 사람들이 독립을 위해 힘쓴 역사를 배울 수 있어요.'}}
+};
+GAME.dex.forEach(e => Object.assign(e, X[e.id] || {}));
+const b = GAME.buildings.find(b => b.label && b.label.indexOf('제암리') === 0); if (b) b.label = '화성시독립운동기념관';
+const p = GAME.pois.find(p => p.id === 'p_jeam'); if (p) p.name = '화성시독립운동기념관';
+const m = GAME.missions.find(m => m.id === 's1'); if (m) m.title = '화성시독립운동기념관 찾기';
+})();
+
+</script>
+<script>
+(() => {
+'use strict';
+const D = window.GAME;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+document.title = D.title;
+document.documentElement.style.setProperty('--acc', D.color);
+document.documentElement.style.setProperty('--acc2', D.color2);
+
+/* ---------- canvas ---------- */
+const cv = $('#c'), ctx = cv.getContext('2d');
+const mini = $('#mini'), mctx = mini.getContext('2d');
+let W = 0, H = 0, DPR = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = innerWidth; H = innerHeight;
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cv.style.width = W + 'px'; cv.style.height = H + 'px';
+}
+addEventListener('resize', resize); resize();
+const isTouch = ('ontouchstart' in window) || (window.matchMedia && matchMedia('(pointer:coarse)').matches);
+if (isTouch) document.body.classList.add('touch');
+const EMOJI = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+const FONT = 'Pretendard,"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif';
+
+/* ---------- geometry ---------- */
+function inPoly(x, y, p) { let c = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const xi = p[i][0], yi = p[i][1], xj = p[j][0], yj = p[j][1]; if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) c = !c; } return c; }
+function inShape(x, y, a) {
+  if (a.poly) return inPoly(x, y, a.poly);
+  if (a.rect) { const r = a.rect; return x >= r[0] && x <= r[0] + r[2] && y >= r[1] && y <= r[1] + r[3]; }
+  if (a.ell) { const e = a.ell; return ((x - e[0]) / e[2]) ** 2 + ((y - e[1]) / e[3]) ** 2 <= 1; }
+  return false;
+}
+function distSeg(px, py, ax, ay, bx, by) { const dx = bx - ax, dy = by - ay, l = dx * dx + dy * dy; let t = l ? ((px - ax) * dx + (py - ay) * dy) / l : 0; t = Math.max(0, Math.min(1, t)); return Math.hypot(px - ax - t * dx, py - ay - t * dy); }
+function nearLine(x, y, pts, w) { for (let i = 0; i < pts.length - 1; i++) if (distSeg(x, y, pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1]) <= w / 2) return true; return false; }
+function centroid(a) {
+  if (a.labelAt) return a.labelAt;
+  if (a.rect) return [a.rect[0] + a.rect[2] / 2, a.rect[1] + a.rect[3] / 2];
+  if (a.ell) return [a.ell[0], a.ell[1]];
+  let x = 0, y = 0; a.poly.forEach(p => { x += p[0]; y += p[1]; }); return [x / a.poly.length, y / a.poly.length];
+}
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+function shade(hex, amt) { let c = hex.replace('#', ''); if (c.length === 3) c = c.split('').map(x => x + x).join(''); const n = parseInt(c, 16); const f = v => Math.max(0, Math.min(255, v + amt)); return '#' + ((1 << 24) + (f(n >> 16) << 16) + (f((n >> 8) & 255) << 8) + f(n & 255)).toString(16).slice(1); }
+
+/* ---------- terrain ---------- */
+const T = {
+  grass: { c: '#a3d977', walk: 1 }, park: { c: '#8fd06a', walk: 1 }, forest: { c: '#6dbb55', walk: 1 },
+  hill: { c: '#7fc25d', walk: 1 }, field: { c: '#bcd96f', walk: 1, pat: 'paddy' }, vine: { c: '#a9cc63', walk: 1, pat: 'vine' },
+  reed: { c: '#d3cb86', walk: 1, pat: 'reed' }, plaza: { c: '#eadfc8', walk: 1 }, sand: { c: '#f3df9e', walk: 1 },
+  town: { c: '#ddd7cd', walk: 1 }, sport: { c: '#62b85a', walk: 1, pat: 'sport' }, land: { c: '#a3d977', walk: 1 },
+  water: { c: '#5bb7e8', walk: 0 }, sea: { c: '#3f9fd8', walk: 0 }, mud: { c: '#9b8466', walk: 'tide', pat: 'mud' }
+};
+const PAT = {};
+function makePatterns() {
+  const mk = (w, h, fn) => { const c = document.createElement('canvas'); c.width = w; c.height = h; fn(c.getContext('2d')); return ctx.createPattern(c, 'repeat'); };
+  PAT.paddy = mk(40, 40, g => { g.strokeStyle = 'rgba(70,120,40,.35)'; g.lineWidth = 2; g.strokeRect(1, 1, 38, 38); g.fillStyle = 'rgba(90,150,60,.35)'; for (let i = 6; i < 40; i += 8) for (let j = 6; j < 40; j += 8) g.fillRect(i, j, 2, 3); });
+  PAT.vine = mk(30, 24, g => { g.fillStyle = 'rgba(70,110,40,.45)'; g.fillRect(0, 10, 30, 4); g.fillStyle = 'rgba(120,60,160,.6)'; g.beginPath(); g.arc(8, 16, 3, 0, 7); g.arc(22, 16, 3, 0, 7); g.fill(); });
+  PAT.reed = mk(24, 24, g => { g.strokeStyle = 'rgba(140,120,60,.45)'; g.lineWidth = 1.5; for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(3 + i * 6, 22); g.lineTo(5 + i * 6, 8); g.stroke(); } });
+  PAT.mud = mk(30, 30, g => { g.fillStyle = 'rgba(70,55,40,.35)'; [[5, 6], [18, 12], [10, 22], [25, 25], [26, 4]].forEach(p => { g.beginPath(); g.arc(p[0], p[1], 1.8, 0, 7); g.fill(); }); g.strokeStyle = 'rgba(255,255,255,.12)'; g.beginPath(); g.moveTo(0, 15); g.quadraticCurveTo(15, 10, 30, 15); g.stroke(); });
+  PAT.sport = mk(60, 60, g => { g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(0, 0, 30, 60); });
+}
+const AREAS = D.areas || [];
+const RIVERS = D.rivers || [];
+const ROADS = D.roads || [];
+const BLD = (D.buildings || []).map(b => Object.assign({ z: 30, c: '#e9e4da' }, b));
+const POIS = D.pois || [];
+const NPCS = D.npcs || [];
+const RIDES = D.rides || [];
+const DEX = {}; (D.dex || []).forEach(e => DEX[e.id] = e);
+const POI = {}; POIS.forEach(p => POI[p.id] = p);
+const QZ = p => p.quiz || (p.dex && DEX[p.dex] && DEX[p.dex].quiz) || null;
+function photoHTML(e) {
+  const q = encodeURIComponent(e.photoQ || e.name);
+  return `${e.img ? `<img class="realimg" src="${e.img}" alt="${esc(e.name)} 사진" onerror="this.remove()">` : ''}<a class="photo-btn" href="https://search.naver.com/search.naver?where=image&query=${q}" target="_blank" rel="noopener">📷 ${esc(e.name)} 실제 사진 보기</a>`;
+}
+const moreHTML = e => e.more ? `<div class="more"><b>🔎 더 알아보기</b><br>${esc(e.more)}</div>` : '';
+const NPC = {}; NPCS.forEach(n => NPC[n.id] = n);
+const RIDE = {}; RIDES.forEach(r => RIDE[r.id] = r);
+const ITEMS = []; (D.items || []).forEach(g => g.pts.forEach((p, i) => ITEMS.push({ key: g.group + i, group: g.group, x: p[0], y: p[1], icon: g.icon, tide: g.tide, name: g.name })));
+const WW = D.world.w, WH = D.world.h;
+
+/* ---------- tide ---------- */
+let lowTide = true, tideT = 0, tideAlpha = 0;
+function tideUpdate(dt) {
+  if (!D.tide) return;
+  const P = D.tide.low + D.tide.high;
+  tideT = (tideT + dt) % P;
+  const nowLow = tideT < D.tide.low;
+  if (nowLow !== lowTide) {
+    lowTide = nowLow;
+    toast(lowTide ? '🌊 썰물! 바닷물이 빠져 바닷길과 갯벌이 드러났어요' : '🌊 밀물! 바닷물이 들어와 바닷길이 잠겨요', 'blue');
+    if (!lowTide && !walkable(P1.x, P1.y)) { P1.x = lastSafe[0]; P1.y = lastSafe[1]; toast('🛟 물이 차올라 안전한 곳으로 이동했어요', 'gold'); }
+  }
+  tideAlpha += ((lowTide ? 0 : 1) - tideAlpha) * Math.min(1, dt * 1.5);
+  const left = Math.ceil(lowTide ? D.tide.low - tideT : P - tideT);
+  const chip = $('#tidechip'); chip.hidden = false;
+  chip.textContent = lowTide ? `🏖️ 썰물 · 바닷길 열림 ${left}초` : `🌊 밀물 · 바닷길 닫힘 ${left}초`;
+}
+
+/* ---------- walkability ---------- */
+function areaAt(x, y) { for (let i = AREAS.length - 1; i >= 0; i--) if (inShape(x, y, AREAS[i])) return AREAS[i]; return null; }
+function walkable(x, y, ignoreTide) {
+  if (x < 10 || y < 10 || x > WW - 10 || y > WH - 10) return false;
+  for (const b of BLD) if (!b.nocol && x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h) return false;
+  for (const r of ROADS) if (r.kind !== 'rail' && nearLine(x, y, r.pts, r.w || 30)) return r.tide ? (ignoreTide ? true : lowTide) : true;
+  for (const r of RIVERS) if (nearLine(x, y, r.pts, r.w)) return false;
+  const a = areaAt(x, y);
+  const t = T[a ? a.t : D.world.bg] || T.grass;
+  if (t.walk === 'tide') return ignoreTide ? true : lowTide;
+  return !!t.walk;
+}
+function safeGround(x, y) { // safe even at high tide
+  if (!D.tide) return walkable(x, y);
+  for (const r of ROADS) if (r.tide && nearLine(x, y, r.pts, (r.w || 30) + 6)) return false;
+  const a = areaAt(x, y); const t = T[a ? a.t : D.world.bg] || T.grass;
+  return t.walk === 1 && walkable(x, y);
+}
+
+/* ---------- state & save ---------- */
+const SKEY = D.key;
+const fresh = () => ({ v: 1, name: '', xp: 0, lv: 1, coins: 0, dex: {}, quiz: {}, missions: {}, items: {}, talked: {}, hats: ['explorer'], outfits: ['green'], hat: 'explorer', outfit: 'green', photos: [], pos: null, finalDone: 0, combo: 0, bossOpenToast: 0 });
+let S = fresh();
+function load() { try { const r = localStorage.getItem(SKEY); if (r) { const o = JSON.parse(r); if (o && o.v === 1) return Object.assign(fresh(), o); } } catch (e) { } return null; }
+let saveT = 0;
+function save() {
+  S.pos = [Math.round(P1.x), Math.round(P1.y)];
+  try { localStorage.setItem(SKEY, JSON.stringify(S)); }
+  catch (e) { try { S.photos = S.photos.slice(0, 3); localStorage.setItem(SKEY, JSON.stringify(S)); } catch (e2) { } }
+}
+
+/* ---------- player & camera ---------- */
+const P1 = { x: D.spawn[0], y: D.spawn[1], z: 0, vz: 0, dir: 1, face: [0, 1], moving: 0, step: 0, hidden: false };
+let lastSafe = D.spawn.slice();
+const cam = { x: P1.x, y: P1.y, z: innerWidth < 640 ? 0.75 : 1 };
+const ZMIN = 0.45, ZMAX = 2.2;
+
+/* ---------- static world pieces ---------- */
+const TREES = [];
+(function genTrees() {
+  const R = rng(D.seed || 7);
+  (D.forests || []).forEach(f => {
+    const shape = f.ell ? { ell: f.ell } : f.rect ? { rect: f.rect } : { poly: f.poly };
+    let bx0 = 0, by0 = 0, bx1 = WW, by1 = WH;
+    if (f.ell) { bx0 = f.ell[0] - f.ell[2]; bx1 = f.ell[0] + f.ell[2]; by0 = f.ell[1] - f.ell[3]; by1 = f.ell[1] + f.ell[3]; }
+    else if (f.rect) { bx0 = f.rect[0]; by0 = f.rect[1]; bx1 = f.rect[0] + f.rect[2]; by1 = f.rect[1] + f.rect[3]; }
+    else { bx0 = Math.min(...f.poly.map(p => p[0])); bx1 = Math.max(...f.poly.map(p => p[0])); by0 = Math.min(...f.poly.map(p => p[1])); by1 = Math.max(...f.poly.map(p => p[1])); }
+    let n = 0, tries = 0;
+    while (n < f.n && tries < f.n * 30) {
+      tries++;
+      const x = bx0 + R() * (bx1 - bx0), y = by0 + R() * (by1 - by0);
+      if (!inShape(x, y, shape)) continue;
+      if (!walkable(x, y, true)) continue;
+      const ar = areaAt(x, y); if (ar && (ar.t === 'mud' || ar.t === 'plaza' || ar.t === 'sport')) continue;
+      let bad = false;
+      for (const r of ROADS) if (nearLine(x, y, r.pts, (r.w || 30) + 26)) { bad = true; break; }
+      if (bad) continue;
+      for (const p of POIS) if (Math.hypot(p.x - x, p.y - y) < 60) { bad = true; break; }
+      for (const p of NPCS) if (Math.hypot(p.x - x, p.y - y) < 50) { bad = true; break; }
+      if (bad) continue;
+      TREES.push({ x, y, s: 0.8 + R() * 0.6, k: f.kind || (R() < 0.3 ? 'pine' : 'round'), t: R() });
+      n++;
+    }
+  });
+  (D.trees || []).forEach(t => TREES.push({ x: t[0], y: t[1], s: t[2] || 1, k: t[3] || 'round', t: 0.5 }));
+})();
+
+/* ---------- drawing ---------- */
+function shapePath(g, a) {
+  g.beginPath();
+  if (a.poly) { g.moveTo(a.poly[0][0], a.poly[0][1]); for (let i = 1; i < a.poly.length; i++) g.lineTo(a.poly[i][0], a.poly[i][1]); g.closePath(); }
+  else if (a.rect) g.rect(a.rect[0], a.rect[1], a.rect[2], a.rect[3]);
+  else if (a.ell) g.ellipse(a.ell[0], a.ell[1], a.ell[2], a.ell[3], 0, 0, Math.PI * 2);
+}
+function drawAreas(g, simple) {
+  for (const a of AREAS) {
+    const t = T[a.t] || T.grass;
+    shapePath(g, a);
+    g.fillStyle = a.c || t.c; g.fill();
+    if (!simple && t.pat && PAT[t.pat]) { g.fillStyle = PAT[t.pat]; g.fill(); }
+    if (!simple && a.t === 'hill' && a.ell) {
+      for (let k = 1; k <= 3; k++) { g.beginPath(); g.ellipse(a.ell[0], a.ell[1], a.ell[2] * (1 - k * 0.22), a.ell[3] * (1 - k * 0.22), 0, 0, 7); g.fillStyle = `rgba(255,255,255,${0.07})`; g.fill(); g.strokeStyle = 'rgba(60,110,40,.25)'; g.lineWidth = 2; g.stroke(); }
+    }
+    if (!simple && (a.t === 'water' || a.t === 'sea')) { g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 4; g.stroke(); }
+    if (a.t === 'mud' && tideAlpha > 0.01 && !simple) { shapePath(g, a); g.fillStyle = `rgba(63,159,216,${0.92 * tideAlpha})`; g.fill(); }
+  }
+}
+function strokeLine(g, pts, w, col, dash) {
+  g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]);
+  g.lineWidth = w; g.strokeStyle = col; g.lineCap = 'round'; g.lineJoin = 'round'; g.setLineDash(dash || []); g.stroke(); g.setLineDash([]);
+}
+function drawRivers(g, simple) {
+  for (const r of RIVERS) { if (r.bank && !simple) strokeLine(g, r.pts, r.w + r.bank, '#86c96a'); }
+  for (const r of RIVERS) { strokeLine(g, r.pts, r.w, '#5bb7e8'); if (!simple) strokeLine(g, r.pts, r.w * 0.45, 'rgba(255,255,255,.18)'); }
+}
+function drawRoads(g, simple) {
+  for (const r of ROADS) {
+    const w = r.w || 30;
+    if (r.kind === 'rail') { if (!simple) { strokeLine(g, r.pts, 10, 'rgba(80,70,90,.35)', [18, 14]); } continue; }
+    if (r.tide && !simple) {
+      strokeLine(g, r.pts, w, '#b9a98c');
+      if (tideAlpha > 0.01) strokeLine(g, r.pts, w + 2, `rgba(63,159,216,${0.95 * tideAlpha})`);
+      continue;
+    }
+    if (r.kind === 'path') { strokeLine(g, r.pts, w, simple ? '#e9dbb8' : '#efe1bd'); continue; }
+    if (r.kind === 'pier') { strokeLine(g, r.pts, w, '#b98a5a'); if (!simple) strokeLine(g, r.pts, w - 8, '#cfa06d', [6, 4]); continue; }
+    if (r.kind === 'bike') { strokeLine(g, r.pts, w, '#d98e7a'); continue; }
+    strokeLine(g, r.pts, w + 6, simple ? '#8b919c' : '#aab0b8');
+    strokeLine(g, r.pts, w, '#7d8590');
+    if (!simple) strokeLine(g, r.pts, 3, 'rgba(255,255,255,.7)', [16, 16]);
+  }
+}
+function txt(g, s, x, y, size, col, stroke, weight) {
+  g.font = `${weight || 800} ${size}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+  if (stroke) { g.lineWidth = Math.max(3, size / 4); g.strokeStyle = stroke; g.lineJoin = 'round'; g.strokeText(s, x, y); }
+  g.fillStyle = col; g.fillText(s, x, y);
+}
+function emo(g, s, x, y, size) { g.font = `${size}px ${EMOJI}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(s, x, y); }
+
+function drawTree(t) {
+  const s = t.s; ctx.fillStyle = 'rgba(0,0,0,.16)'; ctx.beginPath(); ctx.ellipse(t.x + 4, t.y + 2, 15 * s, 6 * s, 0, 0, 7); ctx.fill();
+  ctx.fillStyle = '#8a5a35'; ctx.fillRect(t.x - 3 * s, t.y - 14 * s, 6 * s, 15 * s);
+  if (t.k === 'pine') {
+    ctx.fillStyle = '#3f8f45'; ctx.beginPath(); ctx.moveTo(t.x, t.y - 52 * s); ctx.lineTo(t.x - 17 * s, t.y - 10 * s); ctx.lineTo(t.x + 17 * s, t.y - 10 * s); ctx.fill();
+    ctx.fillStyle = '#4fa553'; ctx.beginPath(); ctx.moveTo(t.x, t.y - 52 * s); ctx.lineTo(t.x - 8 * s, t.y - 28 * s); ctx.lineTo(t.x + 6 * s, t.y - 30 * s); ctx.fill();
+  } else {
+    const c1 = t.t > 0.66 ? '#4e9f48' : t.t > 0.33 ? '#58ad4d' : '#63b552';
+    ctx.fillStyle = c1; ctx.beginPath(); ctx.arc(t.x, t.y - 26 * s, 17 * s, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.beginPath(); ctx.arc(t.x - 6 * s, t.y - 32 * s, 7 * s, 0, 7); ctx.fill();
+  }
+}
+function drawBuilding(b) {
+  const { x, y, w, h } = b, z = b.z;
+  ctx.fillStyle = 'rgba(0,0,0,.16)'; ctx.fillRect(x + 8, y + h - 4, w, 10);
+  if (b.kind === 'dome') {
+    ctx.fillStyle = shade(b.c, -25); ctx.fillRect(x, y + h - z * 0.5, w, z * 0.5);
+    ctx.fillStyle = b.c; ctx.beginPath(); ctx.ellipse(x + w / 2, y + h - z * 0.5, w / 2, z * 0.8, 0, Math.PI, 0); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,.2)'; ctx.lineWidth = 2; ctx.stroke();
+  } else if (b.kind === 'tower') {
+    ctx.fillStyle = shade(b.c, -20); ctx.fillRect(x, y + h - z, w, z);
+    ctx.fillStyle = '#fff'; for (let k = 0; k < 3; k++) ctx.fillRect(x, y + h - z + k * z / 3, w, z / 9);
+    ctx.fillStyle = b.roof || '#ff5a4e'; ctx.beginPath(); ctx.moveTo(x - 4, y + h - z); ctx.lineTo(x + w / 2, y + h - z - 16); ctx.lineTo(x + w + 4, y + h - z); ctx.fill();
+  } else {
+    ctx.fillStyle = shade(b.c, -22); ctx.fillRect(x, y + h - z, w, z);
+    if (b.win !== false) {
+      ctx.fillStyle = b.kind === 'glass' ? 'rgba(200,235,255,.75)' : 'rgba(120,170,210,.75)';
+      const rows = Math.max(1, Math.floor(z / 16)), cols = Math.max(1, Math.floor(w / 16));
+      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) ctx.fillRect(x + 5 + c * (w - 6) / cols, y + h - z + 5 + r * (z - 6) / rows, (w - 6) / cols - 5, (z - 6) / rows - 6);
+    }
+    ctx.fillStyle = b.roof || shade(b.c, 12); ctx.fillRect(x, y - z, w, h);
+    ctx.strokeStyle = 'rgba(0,0,0,.18)'; ctx.lineWidth = 2; ctx.strokeRect(x, y - z, w, h); ctx.strokeRect(x, y + h - z, w, z);
+    if (b.kind === 'house') { ctx.fillStyle = b.roof || '#d9634c'; ctx.beginPath(); ctx.moveTo(x - 4, y - z + h); ctx.lineTo(x + w / 2, y - z - 6); ctx.lineTo(x + w + 4, y - z + h); ctx.fill(); }
+  }
+  if (b.icon) emo(ctx, b.icon, x + w / 2, y - z + h / 2, Math.min(34, Math.max(18, w / 3)));
+  if (b.label && cam.z > 0.6) {
+    const lx = x + w / 2, ly = (b.kind === 'dome' ? y + h - z * 1.4 : y - z) - 12;
+    ctx.font = `800 13px ${FONT}`; const tw = ctx.measureText(b.label).width + 14;
+    ctx.fillStyle = 'rgba(255,255,255,.92)'; roundRect(ctx, lx - tw / 2, ly - 10, tw, 20, 8); ctx.fill();
+    txt(ctx, b.label, lx, ly, 13, '#333');
+  }
+}
+function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+
+const HATS = { explorer: '#e8d19a', straw: '#f2d067', helmet: '#ffd23f', cap: '#e6463c', crown: '#ffcc00', beret: '#5b5bd6' };
+function drawPerson(x, y, z, opt) {
+  const t = performance.now() / 1000;
+  ctx.fillStyle = 'rgba(0,0,0,.2)'; ctx.beginPath(); ctx.ellipse(x, y + 2, 13 - Math.min(5, z / 6), 5, 0, 0, 7); ctx.fill();
+  const yy = y - z, sw = opt.moving ? Math.sin(opt.step * 12) * 3 : 0;
+  // legs
+  ctx.fillStyle = '#3a3a4a'; ctx.fillRect(x - 7, yy - 10 + (sw > 0 ? -sw : 0), 5, 10); ctx.fillRect(x + 2, yy - 10 + (sw < 0 ? sw : 0), 5, 10);
+  // body
+  ctx.fillStyle = opt.body; roundRect(ctx, x - 11, yy - 30, 22, 22, 8); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,.2)'; ctx.lineWidth = 1.5; ctx.stroke();
+  if (opt.pack) { ctx.fillStyle = '#c0703a'; roundRect(ctx, x - 13 - (opt.face[0] > 0 ? 0 : -18), yy - 28, 8, 16, 3); }
+  // head
+  ctx.fillStyle = opt.skin || '#ffd9b3'; ctx.beginPath(); ctx.arc(x, yy - 40, 12, 0, 7); ctx.fill(); ctx.stroke();
+  // eyes
+  if (opt.face[1] >= -0.3) { const ex = opt.face[0] * 4; ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(x - 4 + ex, yy - 40, 1.8, 0, 7); ctx.arc(x + 4 + ex, yy - 40, 1.8, 0, 7); ctx.fill(); ctx.fillStyle = 'rgba(255,120,120,.5)'; ctx.beginPath(); ctx.arc(x - 7 + ex, yy - 36, 2.2, 0, 7); ctx.arc(x + 7 + ex, yy - 36, 2.2, 0, 7); ctx.fill(); }
+  // hair / hat
+  const hat = opt.hat;
+  ctx.fillStyle = opt.hair || '#4a3426';
+  if (!hat) { ctx.beginPath(); ctx.arc(x, yy - 44, 12, Math.PI * 1.05, Math.PI * 1.95); ctx.fill(); }
+  if (hat === 'explorer') { ctx.fillStyle = HATS.explorer; ctx.beginPath(); ctx.ellipse(x, yy - 48, 17, 5, 0, 0, 7); ctx.fill(); ctx.beginPath(); ctx.arc(x, yy - 49, 11, Math.PI, 0); ctx.fill(); ctx.fillStyle = '#8a6a3a'; ctx.fillRect(x - 11, yy - 51, 22, 3); }
+  if (hat === 'straw') { ctx.fillStyle = HATS.straw; ctx.beginPath(); ctx.ellipse(x, yy - 47, 21, 6, 0, 0, 7); ctx.fill(); ctx.beginPath(); ctx.arc(x, yy - 49, 10, Math.PI, 0); ctx.fill(); ctx.fillStyle = '#e45b5b'; ctx.fillRect(x - 10, yy - 51, 20, 3); }
+  if (hat === 'helmet') { ctx.fillStyle = HATS.helmet; ctx.beginPath(); ctx.arc(x, yy - 47, 13, Math.PI, 0); ctx.fill(); ctx.fillRect(x - 16, yy - 48, 32, 4); }
+  if (hat === 'cap') { ctx.fillStyle = HATS.cap; ctx.beginPath(); ctx.arc(x, yy - 47, 12, Math.PI, 0); ctx.fill(); ctx.fillRect(x + (opt.face[0] >= 0 ? 4 : -18), yy - 49, 14, 4); }
+  if (hat === 'beret') { ctx.fillStyle = HATS.beret; ctx.beginPath(); ctx.ellipse(x - 2, yy - 50, 13, 6, -0.15, 0, 7); ctx.fill(); }
+  if (hat === 'crown') { ctx.fillStyle = HATS.crown; ctx.beginPath(); ctx.moveTo(x - 11, yy - 48); ctx.lineTo(x - 11, yy - 60); ctx.lineTo(x - 5, yy - 53); ctx.lineTo(x, yy - 62); ctx.lineTo(x + 5, yy - 53); ctx.lineTo(x + 11, yy - 60); ctx.lineTo(x + 11, yy - 48); ctx.fill(); ctx.fillStyle = '#e8463c'; ctx.beginPath(); ctx.arc(x, yy - 52, 2, 0, 7); ctx.fill(); }
+  if (opt.badge) emo(ctx, opt.badge, x, yy - 72 + Math.sin(t * 3) * 3, 20);
+  if (opt.name && cam.z > 0.55) txt(ctx, opt.name, x, y + 14, 12, '#222', 'rgba(255,255,255,.9)');
+}
+const OUTFITS = { green: '#3fae5a', orange: '#ff8a3d', blue: '#4c7cf0', purple: '#9b5de5', yellow: '#f5c518', pink: '#ff6fa8', navy: '#2c3e70' };
+
+function poiActive(p) { const m = currentMission(); if (!m) return false; return targetPos(m) && (m.target === p.id || (m.kind === 'dex' && p.dex === m.target)); }
+function drawPOI(p) {
+  const t = performance.now() / 1000;
+  const found = p.dex ? !!S.dex[p.dex] : (p.quiz ? !!S.quiz[p.id] : true);
+  const bob = Math.sin(t * 2.5 + p.x) * 3;
+  if (p.look && cam.z > 0.4) { emo(ctx, p.lookIcon || '✨', p.look[0], p.look[1] + bob, 30); }
+  ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(p.x, p.y, 14, 5, 0, 0, 7); ctx.fill();
+  ctx.strokeStyle = '#7a5a3a'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x, p.y - 30); ctx.stroke();
+  const cy = p.y - 46 + bob;
+  if (!found) { ctx.fillStyle = 'rgba(255,207,51,.35)'; ctx.beginPath(); ctx.arc(p.x, cy, 26 + Math.sin(t * 4) * 3, 0, 7); ctx.fill(); }
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(p.x, cy, 19, 0, 7); ctx.fill();
+  ctx.strokeStyle = found ? (p.dex ? (DEX[p.dex].type === 'N' ? '#34b26b' : '#5b7cfa') : '#aaa') : '#ffb300'; ctx.lineWidth = 3; ctx.stroke();
+  emo(ctx, found ? p.icon : '❓', p.x, cy + 1, 22);
+  if (cam.z > 0.5) txt(ctx, found || p.showName ? p.name : '???', p.x, p.y + 14, 13, '#222', 'rgba(255,255,255,.92)');
+}
+function drawItem(it) {
+  if (S.items[it.key]) return;
+  if (it.tide && !lowTide) return;
+  const t = performance.now() / 1000;
+  ctx.fillStyle = 'rgba(0,0,0,.15)'; ctx.beginPath(); ctx.ellipse(it.x, it.y, 9, 4, 0, 0, 7); ctx.fill();
+  emo(ctx, it.icon, it.x, it.y - 12 + Math.sin(t * 3 + it.x) * 2, 20);
+}
+function drawRideLine(r) {
+  if (r.mode !== 'cable') return;
+  const a = r.path[0], b = r.path[r.path.length - 1];
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(a[0], a[1] - 60); ctx.lineTo(b[0], b[1] - 60); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(a[0], a[1] - 54); ctx.lineTo(b[0], b[1] - 54); ctx.stroke();
+  const n = 4; for (let i = 1; i < n; i++) { const x = a[0] + (b[0] - a[0]) * i / n, y = a[1] + (b[1] - a[1]) * i / n; ctx.fillStyle = '#9aa'; ctx.fillRect(x - 3, y - 62, 6, 62); }
+  if (!riding || riding.r !== r) { const k = (performance.now() / 9000) % 1; const x = a[0] + (b[0] - a[0]) * k, y = a[1] + (b[1] - a[1]) * k; drawCabin(x, y - 54, '#ff7a59'); const k2 = (k + 0.5) % 1; drawCabin(a[0] + (b[0] - a[0]) * k2, a[1] + (b[1] - a[1]) * k2 - 54, '#4c7cf0'); }
+}
+function drawCabin(x, y, c) { ctx.strokeStyle = '#444'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 8); ctx.stroke(); ctx.fillStyle = c; roundRect(ctx, x - 13, y + 8, 26, 22, 6); ctx.fill(); ctx.fillStyle = 'rgba(220,240,255,.9)'; ctx.fillRect(x - 9, y + 12, 18, 8); }
+
+let riding = null;
+function render() {
+  const z = cam.z;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = D.world.outside || '#3f9fd8'; ctx.fillRect(0, 0, W, H);
+  ctx.setTransform(DPR * z, 0, 0, DPR * z, DPR * (W / 2 - cam.x * z), DPR * (H / 2 - cam.y * z));
+  ctx.fillStyle = (T[D.world.bg] || T.grass).c; ctx.fillRect(0, 0, WW, WH);
+  drawAreas(ctx); drawRivers(ctx); drawRoads(ctx);
+  // area labels
+  for (const a of AREAS) if (a.label) { const c = centroid(a); txt(ctx, a.label, c[0], c[1], a.lsize || 26, 'rgba(255,255,255,.95)', 'rgba(0,0,0,.28)', 900); }
+  for (const r of RIVERS) if (r.label) txt(ctx, r.label, r.labelAt[0], r.labelAt[1], 20, '#fff', 'rgba(20,80,140,.5)', 900);
+  for (const l of (D.labels || [])) txt(ctx, l[2], l[0], l[1], l[3] || 24, 'rgba(255,255,255,.95)', 'rgba(0,0,0,.28)', 900);
+  for (const r of ROADS) if (r.label) txt(ctx, r.label, r.labelAt[0], r.labelAt[1], 14, '#fff', 'rgba(0,0,0,.4)', 800);
+  // target ring
+  const m = currentMission(); const tp = m && targetPos(m);
+  if (tp) { const t = performance.now() / 1000; ctx.strokeStyle = 'rgba(255,122,89,.85)'; ctx.lineWidth = 4; ctx.setLineDash([10, 8]); ctx.beginPath(); ctx.arc(tp[0], tp[1], 40 + Math.sin(t * 4) * 6, 0, 7); ctx.stroke(); ctx.setLineDash([]); }
+  // decorations (flat)
+  for (const d of (D.decor || [])) emo(ctx, d[2], d[0], d[1] + Math.sin(performance.now() / 700 + d[0]) * (d[3] ? 2 : 0), d[4] || 26);
+  // sortable objects
+  const vx0 = cam.x - W / 2 / z - 120, vx1 = cam.x + W / 2 / z + 120, vy0 = cam.y - H / 2 / z - 120, vy1 = cam.y + H / 2 / z + 160;
+  const vis = (x, y) => x > vx0 && x < vx1 && y > vy0 && y < vy1;
+  const objs = [];
+  for (const t of TREES) if (vis(t.x, t.y)) objs.push([t.y, 0, t]);
+  for (const b of BLD) if (vis(b.x + b.w / 2, b.y + b.h / 2) || vis(b.x, b.y) || vis(b.x + b.w, b.y + b.h)) objs.push([b.y + b.h, 1, b]);
+  for (const p of POIS) if (vis(p.x, p.y)) objs.push([p.y, 2, p]);
+  for (const n of NPCS) if (vis(n.x, n.y)) objs.push([n.y, 3, n]);
+  for (const it of ITEMS) if (vis(it.x, it.y)) objs.push([it.y, 4, it]);
+  if (!P1.hidden) objs.push([P1.y, 5, P1]);
+  objs.sort((a, b) => a[0] - b[0]);
+  for (const o of objs) {
+    if (o[1] === 0) drawTree(o[2]);
+    else if (o[1] === 1) drawBuilding(o[2]);
+    else if (o[1] === 2) drawPOI(o[2]);
+    else if (o[1] === 3) { const n = o[2]; const need = npcHasNews(n); drawPerson(n.x, n.y, 0, { body: n.color || '#888', face: [0, 1], hat: n.hat, hair: n.hair, skin: n.skin, badge: need ? '💬' : n.icon, name: n.name }); }
+    else if (o[1] === 4) drawItem(o[2]);
+    else drawPerson(P1.x, P1.y, P1.z, { body: OUTFITS[S.outfit] || OUTFITS.green, face: P1.face, hat: S.hat, moving: P1.moving, step: P1.step, pack: true, name: S.name });
+  }
+  for (const r of RIDES) drawRideLine(r);
+  if (riding) {
+    const r = riding;
+    if (r.r.mode === 'cable') drawCabin(r.pos[0], r.pos[1] - 54, '#ffcf33');
+    else { ctx.fillStyle = 'rgba(0,0,0,.2)'; ctx.beginPath(); ctx.ellipse(r.pos[0], r.pos[1] + 4, 30, 8, 0, 0, 7); ctx.fill(); emo(ctx, r.r.icon || '🚌', r.pos[0], r.pos[1] - 18, 52); }
+  }
+  // sea decor waves
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+
+/* ---------- minimap ---------- */
+const MAPC = document.createElement('canvas');
+function buildMap() {
+  const sc = 360 / WW; MAPC.width = 360; MAPC.height = Math.round(WH * sc);
+  const g = MAPC.getContext('2d'); g.setTransform(sc, 0, 0, sc, 0, 0);
+  g.fillStyle = (T[D.world.bg] || T.grass).c; g.fillRect(0, 0, WW, WH);
+  drawAreas(g, true); drawRivers(g, true); drawRoads(g, true);
+  g.fillStyle = '#c9c1b5'; for (const b of BLD) g.fillRect(b.x, b.y - b.z * 0.2, b.w, b.h);
+  for (const t of TREES) { g.fillStyle = '#5aa64e'; g.fillRect(t.x - 8, t.y - 8, 16, 16); }
+}
+function drawMapDyn(g, w, h, labels) {
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
+  g.drawImage(MAPC, 0, 0, w, h);
+  const sx = w / WW, sy = h / WH;
+  if (D.tide && tideAlpha > 0.05) { g.save(); g.setTransform(sx, 0, 0, sy, 0, 0); for (const a of AREAS) if (a.t === 'mud') { shapePath(g, a); g.fillStyle = `rgba(63,159,216,${0.9 * tideAlpha})`; g.fill(); } for (const r of ROADS) if (r.tide) strokeLine(g, r.pts, (r.w || 30) + 4, `rgba(63,159,216,${tideAlpha})`); g.restore(); }
+  for (const p of POIS) {
+    const f = p.dex ? S.dex[p.dex] : (p.quiz ? S.quiz[p.id] : 1);
+    g.fillStyle = f ? (p.dex ? (DEX[p.dex].type === 'N' ? '#34b26b' : '#5b7cfa') : '#888') : '#ffb300';
+    g.beginPath(); g.arc(p.x * sx, p.y * sy, labels ? 7 : 4, 0, 7); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 1.5; g.stroke();
+    if (labels) { g.font = `700 11px ${FONT}`; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = 'rgba(255,255,255,.9)'; const nm = f || p.showName ? p.name : '???'; g.strokeText(nm, p.x * sx, p.y * sy + 15); g.fillStyle = '#222'; g.fillText(nm, p.x * sx, p.y * sy + 15); }
+  }
+  if (labels) for (const l of (D.labels || [])) { g.font = `900 13px ${FONT}`; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = 'rgba(0,0,0,.35)'; g.strokeText(l[2], l[0] * sx, l[1] * sy); g.fillStyle = '#fff'; g.fillText(l[2], l[0] * sx, l[1] * sy); }
+  if (labels) for (const r of RIVERS) if (r.label) { g.font = `900 12px ${FONT}`; g.textAlign = 'center'; g.fillStyle = '#1d6fa5'; g.fillText(r.label, r.labelAt[0] * sx, r.labelAt[1] * sy); }
+  if (labels) for (const a of AREAS) if (a.label) { const c = centroid(a); g.font = `900 13px ${FONT}`; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = 'rgba(0,0,0,.35)'; g.strokeText(a.label, c[0] * sx, c[1] * sy); g.fillStyle = '#fff'; g.fillText(a.label, c[0] * sx, c[1] * sy); }
+  const m = currentMission(); const tp = m && targetPos(m);
+  if (tp) { g.font = `${labels ? 22 : 16}px ${EMOJI}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('⭐', tp[0] * sx, tp[1] * sy); }
+  const px = (riding ? riding.pos[0] : P1.x) * sx, py = (riding ? riding.pos[1] : P1.y) * sy;
+  g.fillStyle = '#ff3b3b'; g.beginPath(); g.arc(px, py, labels ? 8 : 6, 0, 7); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 2.5; g.stroke();
+  if (!labels) { g.strokeStyle = 'rgba(0,0,0,.5)'; g.lineWidth = 1.5; g.strokeRect((cam.x - W / 2 / cam.z) * sx, (cam.y - H / 2 / cam.z) * sy, W / cam.z * sx, H / cam.z * sy); }
+}
+
+/* ---------- missions ---------- */
+const MISSIONS = D.missions;
+const mainMissions = () => MISSIONS.filter(m => m.main);
+function currentMission() { return mainMissions().find(m => !S.missions[m.id]) || null; }
+function allMainDone() { return mainMissions().every(m => S.missions[m.id]); }
+function dexCount(type) { return Object.keys(S.dex).filter(k => DEX[k] && DEX[k].type === type).length; }
+function targetPos(m) {
+  if (!m) return null;
+  if (m.at) return m.at;
+  if (m.kind === 'talk') { const n = NPC[m.target]; return n && [n.x, n.y]; }
+  if (m.kind === 'dex') { const p = POIS.find(p => p.dex === m.target); return p && [p.x, p.y]; }
+  if (m.kind === 'quiz' || m.kind === 'photo') { const p = POI[m.target]; return p && (m.kind === 'photo' && p.look ? [p.x, p.y] : [p.x, p.y]); }
+  if (m.kind === 'reach') return m.target;
+  if (m.kind === 'ride') { const r = RIDE[m.target]; return r && (dist([P1.x, P1.y], r.path[0]) < dist([P1.x, P1.y], r.path[r.path.length - 1]) ? r.path[0] : r.path[r.path.length - 1]); }
+  if (m.kind === 'count') { let best = null, bd = 1e9; for (const it of ITEMS) if (it.group === m.target && !S.items[it.key]) { const d = dist([P1.x, P1.y], [it.x, it.y]); if (d < bd) { bd = d; best = [it.x, it.y]; } } return best; }
+  if (m.kind === 'dexAll') { let best = null, bd = 1e9; for (const p of POIS) if (p.dex && !S.dex[p.dex]) { const need = DEX[p.dex].type === 'N' ? dexCount('N') < m.n : dexCount('H') < m.h; if (!need) continue; const d = dist([P1.x, P1.y], [p.x, p.y]); if (d < bd) { bd = d; best = [p.x, p.y]; } } return best; }
+  return null;
+}
+function progressText(m) {
+  if (m.kind === 'count') { const c = ITEMS.filter(i => i.group === m.target && S.items[i.key]).length; return ` (${c}/${m.n})`; }
+  if (m.kind === 'dexAll') return ` (자연 ${Math.min(dexCount('N'), m.n)}/${m.n} · 인문 ${Math.min(dexCount('H'), m.h)}/${m.h})`;
+  return '';
+}
+function completeMission(m) {
+  if (S.missions[m.id]) return;
+  S.missions[m.id] = 1;
+  const xp = m.xp || 50, co = m.coin || 20;
+  toast(`🎯 미션 완료! ${m.title}  +${xp}XP 🪙+${co}`, 'good');
+  sfx('win'); S.coins += co; addXP(xp);
+  const nx = currentMission();
+  if (m.main && nx) setTimeout(() => toast(`➡️ 다음 미션: ${nx.title}`), 900);
+  if (allMainDone() && !S.bossOpenToast) {
+    S.bossOpenToast = 1;
+    const sayFree = () => { if (modalOpen() || dialogOpen() || riding || photoMode) setTimeout(sayFree, 600); else say(D.bossIntro); }; setTimeout(sayFree, 1200);
+  }
+  updateHUD(); save();
+}
+function ev(kind, target) { for (const m of MISSIONS) if (!S.missions[m.id] && m.kind === kind && m.target === target) completeMission(m); checkAgg(); }
+function checkAgg() {
+  for (const m of MISSIONS) {
+    if (S.missions[m.id]) continue;
+    if (m.kind === 'count') { const c = ITEMS.filter(i => i.group === m.target && S.items[i.key]).length; if (c >= m.n) completeMission(m); }
+    if (m.kind === 'dexAll' && dexCount('N') >= m.n && dexCount('H') >= m.h) completeMission(m);
+    if (m.kind === 'dex' && S.dex[m.target]) completeMission(m);
+    if (m.kind === 'quiz' && S.quiz[m.target]) completeMission(m);
+  }
+}
+function checkReach() {
+  for (const m of MISSIONS) if (!S.missions[m.id] && m.kind === 'reach' && Math.hypot(P1.x - m.target[0], P1.y - m.target[1]) < (m.r || 60)) { if (m.cond === 'low' && !lowTide) continue; completeMission(m); }
+}
+function npcHasNews(n) { const m = currentMission(); if (m && m.kind === 'talk' && m.target === n.id) return true; return !S.talked[n.id]; }
+
+/* ---------- XP ---------- */
+const need = lv => 60 + lv * 40;
+function addXP(n) {
+  S.xp += n;
+  while (S.xp >= need(S.lv)) { S.xp -= need(S.lv); S.lv++; S.coins += 20; toast(`⭐ 레벨 업! Lv.${S.lv}  🪙+20`, 'gold'); sfx('lv'); }
+  updateHUD();
+}
+
+/* ---------- HUD ---------- */
+const DEXN = (D.dex || []).length;
+function updateHUD() {
+  $('#rname').textContent = D.regionName;
+  $('#lv').textContent = S.lv; $('#coins').textContent = S.coins;
+  $('#xpfill').style.width = (100 * S.xp / need(S.lv)) + '%';
+  $('#dexpct').textContent = Math.round(100 * Object.keys(S.dex).length / DEXN) + '%';
+  const m = currentMission();
+  if (m) { $('#qTitle').textContent = '🎯 ' + m.title + progressText(m); $('#qHint').textContent = m.hint; }
+  else if (!S.finalDone) { $('#qTitle').textContent = '🦉 박사 시험에 도전하세요!'; $('#qHint').textContent = '아래 🦉 박사 시험 버튼을 눌러요.'; }
+  else { $('#qTitle').textContent = '👑 환경 박사 달성!'; $('#qHint').textContent = '남은 도감과 숨은 미션을 찾아보세요.'; }
+  $('#bBoss').classList.toggle('hot', !!(allMainDone() && !S.finalDone));
+}
+function updateQuestArrow() {
+  const m = currentMission(); const tp = m && targetPos(m);
+  const px = riding ? riding.pos[0] : P1.x, py = riding ? riding.pos[1] : P1.y;
+  if (!tp) { $('#qDist').textContent = ''; $('#qArrow').style.transform = 'none'; $('#qArrow').textContent = m ? '🔍' : '🦉'; return; }
+  const dx = tp[0] - px, dy = tp[1] - py, d = Math.hypot(dx, dy);
+  $('#qArrow').textContent = d < 70 ? '📍' : '➤';
+  $('#qArrow').style.transform = d < 70 ? 'none' : `rotate(${Math.atan2(dy, dx)}rad)`;
+  $('#qDist').textContent = d < 70 ? '도착!' : Math.round(d / 10) * 10 + 'm';
+}
+
+/* ---------- toasts & sound ---------- */
+function toast(s, k) { const d = document.createElement('div'); d.className = 'toast ' + (k || ''); d.textContent = s; $('#toasts').appendChild(d); setTimeout(() => d.remove(), 2600); const all = $('#toasts').children; if (all.length > 3) all[0].remove(); }
+let AC = null;
+function sfx(k) {
+  try {
+    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    const seq = { ok: [660, 880], no: [300, 220], win: [523, 659, 784, 1046], lv: [784, 988, 1175], pick: [880], click: [520], snap: [1200, 600] }[k] || [600];
+    seq.forEach((f, i) => { const o = AC.createOscillator(), g = AC.createGain(); o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, AC.currentTime + i * 0.09); g.gain.exponentialRampToValueAtTime(0.12, AC.currentTime + i * 0.09 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime + i * 0.09 + 0.16); o.connect(g).connect(AC.destination); o.start(AC.currentTime + i * 0.09); o.stop(AC.currentTime + i * 0.09 + 0.18); });
+  } catch (e) { }
+}
+
+/* ---------- dialog ---------- */
+let dq = [], dcb = null;
+const dialogOpen = () => !$('#dialog').hidden;
+function say(lines, cb) { dq = lines.slice(); dcb = cb || null; nextLine(); }
+function nextLine() {
+  if (!dq.length) { $('#dialog').hidden = true; const f = dcb; dcb = null; if (f) f(); return; }
+  const l = dq.shift();
+  $('#dialog').hidden = false;
+  $('#dIcon').textContent = l.icon || '🧭';
+  $('#dWho').textContent = l.who || '';
+  $('#dText').innerHTML = esc(l.text).replace(/\{name\}/g, esc(S.name || '대원'));
+  const ch = $('#dChoices'); ch.innerHTML = '';
+  $('#dNext').hidden = !!l.choices;
+  if (l.choices) l.choices.forEach(c => { const b = document.createElement('button'); b.textContent = c.label; b.onclick = () => { dq = []; $('#dialog').hidden = true; dcb = null; c.fn(); }; ch.appendChild(b); });
+}
+$('#dNext').onclick = () => { sfx('click'); nextLine(); };
+
+/* ---------- modal ---------- */
+let mClose = null;
+const modalOpen = () => !$('#modal').hidden;
+function openModal(html, onClose) { $('#mbody').innerHTML = html; $('#modal').hidden = false; mClose = onClose || null; $('.mbox').scrollTop = 0; }
+function closeModal() { if ($('#modal').hidden) return; $('#modal').hidden = true; const f = mClose; mClose = null; if (f) f(); }
+$('#mClose').onclick = closeModal;
+$('#modal').addEventListener('pointerdown', e => { if (e.target.id === 'modal') closeModal(); });
+
+/* ---------- POI / NPC interactions ---------- */
+function openPOI(p) {
+  if (p.dex && !S.dex[p.dex]) return classify(p);
+  if (QZ(p) && !S.quiz[p.id]) return askQuiz(p);
+  const e = p.dex && DEX[p.dex];
+  const lines = [{ who: p.name, icon: p.icon, text: p.info || (e && e.desc) || '' }];
+  if (e) lines.push({ who: e.type === 'N' ? '🌿 자연환경' : '🏙️ 인문환경', icon: e.icon, text: e.why });
+  if (e && e.more) lines.push({ who: '🔎 더 알아보기', icon: e.icon, text: e.more });
+  if (e) lines.push({ who: '탐험 팁', icon: '📖', text: '도감(Tab)에서 이 장소를 누르면 실제 사진 보기 버튼이 있어요.' });
+  if (p.photoHint) lines.push({ who: '탐험 팁', icon: '📷', text: p.photoHint });
+  say(lines);
+}
+function classify(p) {
+  const e = DEX[p.dex];
+  sfx('click');
+  openModal(`<div class="card"><div class="big">${e.icon}</div><h2>${esc(e.name)}</h2><p>${esc(e.desc)}</p>
+    <h3>이것은 어떤 환경일까요?</h3>
+    <div class="two"><button class="btn nat" data-a="N">🌿 자연환경</button><button class="btn hum" data-a="H">🏙️ 인문환경</button></div>
+    <div id="fbx"></div></div>`, () => { if (S.dex[p.dex] && QZ(p) && !S.quiz[p.id]) askQuiz(p); });
+  document.querySelectorAll('.two button').forEach(b => b.onclick = () => {
+    const ok = b.dataset.a === e.type;
+    S.dex[p.dex] = { ok: ok ? 1 : 0 };
+    let xp = 5, co = 0;
+    if (ok) { S.combo = (S.combo || 0) + 1; xp = 30 + Math.min(25, (S.combo - 1) * 5); co = 10; sfx('ok'); } else { S.combo = 0; sfx('no'); }
+    S.coins += co;
+    document.querySelectorAll('.two button').forEach(x => x.disabled = true);
+    $('#fbx').innerHTML = `<div class="fb ${ok ? 'ok' : 'no'}"><b>${ok ? '⭕ 정답!' : '❌ 아쉬워요!'}</b> 이것은 <b>${e.type === 'N' ? '🌿 자연환경' : '🏙️ 인문환경'}</b>이에요.<br>${esc(e.why)}<br><small>+${xp}XP${co ? ' · 🪙+' + co : ''}${ok && S.combo > 1 ? ' · 🔥 연속 ' + S.combo + '번 정답!' : ''}</small></div>${moreHTML(e)}${photoHTML(e)}<div style="margin-top:12px"><button class="btn" id="fbOk">${QZ(p) && !S.quiz[p.id] ? '도감에 기록하고 퀴즈 풀기 🧩' : '도감에 기록하기 📖'}</button></div>`;
+    $('#fbOk').onclick = closeModal;
+    toast(`📖 도감 등록: ${e.name}`, ok ? 'good' : '');
+    addXP(xp); ev('dex', p.dex); updateHUD(); save();
+  });
+}
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function askQuiz(p) {
+  const q = QZ(p); let tries = 0;
+  const order = shuffle(q.o.map((_, i) => i));
+  openModal(`<div class="card"><div class="big">${p.icon}</div><h2>🧩 ${esc(p.name)} 퀴즈</h2><div class="bossq">${esc(q.q)}</div>
+    <div class="opts">${order.map(i => `<button data-i="${i}">${esc(q.o[i])}</button>`).join('')}</div><div id="fbx"></div></div>`);
+  document.querySelectorAll('.opts button').forEach(b => b.onclick = () => {
+    const i = +b.dataset.i; tries++;
+    if (i === q.a) {
+      b.classList.add('right'); sfx('ok');
+      const xp = tries === 1 ? 40 : 15, co = tries === 1 ? 15 : 5;
+      S.quiz[p.id] = 1; S.coins += co;
+      document.querySelectorAll('.opts button').forEach(x => x.disabled = true);
+      $('#fbx').innerHTML = `<div class="fb ok"><b>⭕ 정답!</b> ${esc(q.exp)}<br><small>+${xp}XP · 🪙+${co}</small></div><div style="margin-top:12px"><button class="btn" id="fbOk">좋아요!</button></div>`;
+      $('#fbOk').onclick = closeModal;
+      addXP(xp); ev('quiz', p.id); save();
+    } else { b.classList.add('wrong'); b.disabled = true; sfx('no'); $('#fbx').innerHTML = `<div class="fb no">❌ 다시 생각해 볼까요? ${q.hint ? '힌트: ' + esc(q.hint) : ''}</div>`; }
+  });
+}
+function talk(n) {
+  const first = !S.talked[n.id];
+  const lines = (first || !n.after ? n.lines : n.after).map(t => typeof t === 'string' ? { who: n.name, icon: n.icon, text: t } : t);
+  say(lines, () => { S.talked[n.id] = 1; ev('talk', n.id); if (n.give) n.give.forEach(k => { if (!S.missions[k]) { } }); updateHUD(); save(); });
+}
+function startRide(r, fromEnd) {
+  const path = fromEnd ? r.path.slice().reverse() : r.path.slice();
+  let L = 0; const seg = []; for (let i = 0; i < path.length - 1; i++) { const l = dist(path[i], path[i + 1]); seg.push(l); L += l; }
+  riding = { r, path, seg, L, t: 0, pos: path[0].slice() };
+  P1.hidden = true; $('#prompt').hidden = true;
+  toast(`${r.icon} ${r.name} 출발!`, 'blue'); sfx('click');
+}
+function rideUpdate(dt) {
+  const R = riding; R.t += dt; const k = Math.min(1, R.t / R.r.dur); let d = k * R.L;
+  for (let i = 0; i < R.seg.length; i++) { if (d <= R.seg[i] || i === R.seg.length - 1) { const f = R.seg[i] ? Math.min(1, d / R.seg[i]) : 1; R.pos = [R.path[i][0] + (R.path[i + 1][0] - R.path[i][0]) * f, R.path[i][1] + (R.path[i + 1][1] - R.path[i][1]) * f]; break; } d -= R.seg[i]; }
+  if (k >= 1) {
+    const end = R.path[R.path.length - 1];
+    P1.x = end[0] + (R.r.exit ? 0 : 0); P1.y = end[1] + 40; if (!walkable(P1.x, P1.y)) { P1.y = end[1]; }
+    P1.hidden = false; riding = null; lastSafe = [P1.x, P1.y];
+    toast(`${R.r.icon} 도착! ${R.r.arrive || ''}`, 'good');
+    ev('ride', R.r.id); save();
+    if (R.r.after) say(R.r.after.map(t => ({ who: R.r.name, icon: R.r.icon, text: t })));
+  }
+}
+
+/* ---------- nearest interactable ---------- */
+function nearest() {
+  let best = null, bd = 1e9;
+  const pp = [P1.x, P1.y];
+  for (const p of POIS) { const d = dist(pp, [p.x, p.y]); if (d < (p.r || 75) && d < bd) { bd = d; best = { k: 'poi', o: p, label: (p.dex && !S.dex[p.dex] ? '살펴보기 · ' : QZ(p) && !S.quiz[p.id] ? '퀴즈 · ' : '다시 보기 · ') + (p.dex && !S.dex[p.dex] && !p.showName ? '???' : p.name) }; } }
+  for (const n of NPCS) { const d = dist(pp, [n.x, n.y]); if (d < 70 && d < bd) { bd = d; best = { k: 'npc', o: n, label: '이야기하기 · ' + n.name }; } }
+  for (const r of RIDES) { [0, 1].forEach(e => { const pt = e ? r.path[r.path.length - 1] : r.path[0]; const d = dist(pp, pt); if (d < 80 && d < bd) { bd = d; best = { k: 'ride', o: r, end: e, label: `${r.icon} ${r.name} 타기 → ${e ? r.stations[0] : r.stations[1]}` }; } }); }
+  return best;
+}
+let near = null;
+function interact() {
+  if (uiBlocked()) return;
+  if (!near) return;
+  if (near.k === 'poi') openPOI(near.o);
+  else if (near.k === 'npc') talk(near.o);
+  else if (near.k === 'ride') startRide(near.o, near.end === 1);
+}
+$('#prompt').onclick = interact;
+
+/* ---------- modals content ---------- */
+function showMissions() {
+  const row = (m, i, cur) => `<div class="mi ${S.missions[m.id] ? 'done' : ''} ${cur ? 'now' : ''}"><span class="s">${S.missions[m.id] ? '✅' : cur ? '▶️' : m.main ? '⬜' : '✨'}</span><div>${m.main ? (i + 1) + '. ' : ''}${esc(m.title)}${progressText(m)}<small>${esc(m.hint)}</small></div></div>`;
+  const cm = currentMission();
+  const mains = mainMissions(), side = MISSIONS.filter(m => !m.main);
+  openModal(`<h2>🎯 미션 (${mains.filter(m => S.missions[m.id]).length}/${mains.length})</h2>
+  <div class="mlist">${mains.map((m, i) => row(m, i, m === cm)).join('')}</div>
+  ${side.length ? `<h3>✨ 숨은 미션</h3><div class="mlist">${side.map(m => row(m, 0, false)).join('')}</div>` : ''}
+  <h3>🦉 박사 시험</h3><div class="mi ${S.finalDone ? 'done' : ''}"><span class="s">${S.finalDone ? '👑' : allMainDone() ? '🔓' : '🔒'}</span><div>환경 박사 시험${S.finalDone ? ' 통과!' : allMainDone() ? ' 도전 가능!' : ''}<small>모든 미션을 마치면 열려요.</small></div></div>`);
+}
+function showDex(focus) {
+  const col = t => {
+    const list = D.dex.filter(e => e.type === t);
+    return `<div class="dexcol ${t}"><h3>${t === 'N' ? '🌿 자연환경' : '🏙️ 인문환경'} (${dexCount(t)}/${list.length})</h3><div class="dexgrid">${list.map(e => {
+      const f = S.dex[e.id];
+      return f ? `<div class="dexitem ${f.ok ? '' : 'miss'}" data-id="${e.id}"><div class="i">${e.icon}</div>${esc(e.name)}${f.ok ? '' : '<br><small>✏️ 다시 보기</small>'}</div>` : `<div class="dexitem no"><div class="i">❓</div>???</div>`;
+    }).join('')}</div></div>`;
+  };
+  openModal(`<h2>📖 ${esc(D.regionName)} 환경 도감 (${Object.keys(S.dex).length}/${DEXN})</h2>
+  <p style="margin-top:0">🌿 <b>자연환경</b>: 사람이 만들지 않은, 자연 그대로의 환경 (산, 하천, 바다, 날씨 …)<br>🏙️ <b>인문환경</b>: 사람이 자연을 이용하거나 새로 만든 환경 (도로, 건물, 논밭, 공원 …)</p>
+  <div class="dexcols">${col('N')}${col('H')}</div>`);
+  document.querySelectorAll('.dexitem[data-id]').forEach(d => d.onclick = () => {
+    const e = DEX[d.dataset.id];
+    openModal(`<div class="card"><div class="big">${e.icon}</div><h2>${esc(e.name)}</h2><p>${esc(e.desc)}</p><div class="fb ${e.type === 'N' ? 'ok' : 'ok'}" style="border-color:${e.type === 'N' ? 'var(--nat)' : 'var(--hum)'}"><b>${e.type === 'N' ? '🌿 자연환경' : '🏙️ 인문환경'}</b><br>${esc(e.why)}</div>${moreHTML(e)}${(() => { const p = POIS.find(x => x.dex === e.id); const q = p && QZ(p); if (!q) return ''; return `<div class="more"><b>🧩 퀴즈</b><br>${esc(q.q)}<br>${S.quiz[p.id] ? `✅ 정답: <b>${esc(q.o[q.a])}</b>` : '❔ 아직 풀지 않았어요. 장소에 가서 풀어 보세요!'}</div>`; })()}${photoHTML(e)}<div style="margin-top:12px"><button class="btn" id="back">◀ 도감으로</button></div></div>`);
+    $('#back').onclick = () => showDex();
+  });
+}
+function showAlbum() {
+  openModal(`<h2>🖼️ 탐험 앨범 (${S.photos.length}/8)</h2>${S.photos.length ? `<div class="album">${S.photos.map(p => `<figure><img src="${p.img}" alt=""><figcaption>${esc(p.t)}</figcaption></figure>`).join('')}</div>` : '<p>아직 사진이 없어요. 📷 사진 버튼(C)을 눌러 찍어 보세요!</p>'}<p style="font-size:13px;color:#777">사진은 최근 8장까지 이 기기에 저장돼요.</p>`);
+}
+const SHOP_H = [{ id: 'explorer', n: '탐험모', p: 0, i: '🤠' }, { id: 'cap', n: '야구모자', p: 40, i: '🧢' }, { id: 'straw', n: '밀짚모자', p: 60, i: '👒' }, { id: 'helmet', n: '안전모', p: 80, i: '⛑️' }, { id: 'beret', n: '화가 베레모', p: 100, i: '🎨' }, { id: 'crown', n: '박사 왕관', p: -1, i: '👑' }, { id: '', n: '모자 벗기', p: 0, i: '🙂' }];
+const SHOP_O = [{ id: 'green', n: '초록 조끼', p: 0 }, { id: 'orange', n: '주황 조끼', p: 30 }, { id: 'blue', n: '파랑 조끼', p: 30 }, { id: 'yellow', n: '노랑 조끼', p: 50 }, { id: 'pink', n: '분홍 조끼', p: 50 }, { id: 'purple', n: '보라 조끼', p: 70 }, { id: 'navy', n: '남색 조끼', p: 70 }];
+function showCloset() {
+  const hb = h => { const own = h.id === '' || S.hats.includes(h.id); return `<button data-h="${h.id}" class="${S.hat === h.id ? 'on' : ''}"><div class="hi">${h.i}</div>${h.n}<br><small>${own ? (S.hat === h.id ? '착용 중' : '입기') : h.p < 0 ? '🔒 박사 시험' : '🪙 ' + h.p}</small></button>`; };
+  const ob = o => { const own = S.outfits.includes(o.id); return `<button data-o="${o.id}" class="${S.outfit === o.id ? 'on' : ''}"><div class="sw" style="background:${OUTFITS[o.id]}"></div>${o.n}<br><small>${own ? (S.outfit === o.id ? '착용 중' : '입기') : '🪙 ' + o.p}</small></button>`; };
+  openModal(`<h2>👕 옷장 <span style="font-size:16px">🪙 ${S.coins}</span></h2><h3>모자</h3><div class="shop">${SHOP_H.map(hb).join('')}</div><h3>탐험 조끼</h3><div class="shop">${SHOP_O.map(ob).join('')}</div><p style="font-size:13px;color:#777">코인은 도감 기록, 퀴즈, 미션, 레벨 업으로 모아요.</p>`);
+  document.querySelectorAll('[data-h]').forEach(b => b.onclick = () => {
+    const h = SHOP_H.find(x => x.id === b.dataset.h);
+    if (h.id === '' || S.hats.includes(h.id)) S.hat = h.id;
+    else if (h.p < 0) { toast('👑 박사 시험을 통과하면 받을 수 있어요'); return; }
+    else if (S.coins >= h.p) { S.coins -= h.p; S.hats.push(h.id); S.hat = h.id; sfx('ok'); toast(`${h.i} ${h.n}을(를) 샀어요!`, 'gold'); }
+    else { toast('🪙 코인이 부족해요'); sfx('no'); return; }
+    save(); updateHUD(); showCloset();
+  });
+  document.querySelectorAll('[data-o]').forEach(b => b.onclick = () => {
+    const o = SHOP_O.find(x => x.id === b.dataset.o);
+    if (S.outfits.includes(o.id)) S.outfit = o.id;
+    else if (S.coins >= o.p) { S.coins -= o.p; S.outfits.push(o.id); S.outfit = o.id; sfx('ok'); toast(`👕 ${o.n}을(를) 샀어요!`, 'gold'); }
+    else { toast('🪙 코인이 부족해요'); sfx('no'); return; }
+    save(); updateHUD(); showCloset();
+  });
+}
+function showBoss() {
+  if (!allMainDone()) {
+    const left = mainMissions().filter(m => !S.missions[m.id]);
+    openModal(`<div class="boss"><div class="big" style="font-size:70px">🦉🔒</div><h2>${esc(D.boss.name)}</h2><p>모든 미션을 마치면 박사 시험이 열려요!<br>남은 미션: <b>${left.length}개</b></p><div class="mlist" style="text-align:left">${left.slice(0, 4).map(m => `<div class="mi"><span class="s">⬜</span><div>${esc(m.title)}<small>${esc(m.hint)}</small></div></div>`).join('')}</div></div>`);
+    return;
+  }
+  if (S.finalDone) { showCert(true); return; }
+  bossIntroScreen();
+}
+function bossIntroScreen() {
+  openModal(`<div class="boss"><div style="font-size:80px">🦉</div><h2>${esc(D.boss.name)}</h2><p>${esc(D.boss.intro)}</p><p>❤️ 3개로 문제 ${D.boss.q.length}개를 모두 맞히면 통과! 틀린 문제는 뒤로 돌아와요.</p><button class="btn" id="bgo" style="font-size:20px;padding:14px 28px">시험 시작! ✏️</button></div>`);
+  $('#bgo').onclick = bossStart;
+}
+let B = null;
+function bossStart() { B = { q: shuffle(D.boss.q.map((_, i) => i)), hp: D.boss.q.length, max: D.boss.q.length, hearts: 3, right: 0, tries: 0 }; bossRender(); }
+function bossRender(fb) {
+  const qi = B.q[0], q = D.boss.q[qi]; const order = shuffle(q.o.map((_, i) => i));
+  openModal(`<div class="boss"><div style="font-size:60px">🦉</div><b>${esc(D.boss.name)}</b><div class="hpbar"><i style="width:${100 * B.hp / B.max}%"></i></div><div class="hearts">${'❤️'.repeat(B.hearts)}${'🤍'.repeat(3 - B.hearts)}</div>${fb || ''}
+  <div class="bossq">Q. ${esc(q.q)}</div><div class="opts">${order.map(i => `<button data-i="${i}">${esc(q.o[i])}</button>`).join('')}</div></div>`);
+  document.querySelectorAll('.opts button').forEach(b => b.onclick = () => {
+    const i = +b.dataset.i; B.tries++;
+    document.querySelectorAll('.opts button').forEach(x => x.disabled = true);
+    if (i === q.a) { b.classList.add('right'); sfx('ok'); B.hp--; B.right++; B.q.shift(); }
+    else { b.classList.add('wrong'); sfx('no'); B.hearts--; B.q.push(B.q.shift()); }
+    const f = `<div class="fb ${i === q.a ? 'ok' : 'no'}">${i === q.a ? '⭕ 정답! 박사님의 체력이 줄었어요!' : '❌ 앗! 정답은 「' + esc(q.o[q.a]) + '」'}<br><small>${esc(q.exp)}</small></div>`;
+    setTimeout(() => {
+      if (B.hp <= 0) return bossWin();
+      if (B.hearts <= 0) return bossLose();
+      bossRender(f);
+    }, i === q.a ? 650 : 1500);
+  });
+}
+function bossWin() {
+  S.finalDone = 1; if (!S.hats.includes('crown')) S.hats.push('crown'); S.hat = 'crown';
+  S.coins += 200; addXP(300); sfx('win'); save(); updateHUD();
+  showCert(false);
+}
+function bossLose() {
+  openModal(`<div class="boss"><div style="font-size:70px">🦉💦</div><h2>아쉬워요!</h2><p>하트를 모두 썼어요. 도감을 다시 읽어 보고 도전해요!</p><div class="row two"><button class="btn" id="br">다시 도전 🔁</button><button class="btn gray" id="bd">📖 도감 보기</button></div></div>`);
+  $('#br').onclick = bossStart; $('#bd').onclick = () => showDex();
+}
+function showCert(again) {
+  const d = new Date(); const ds = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+  openModal(`<div class="cert"><div style="font-size:50px">🏅</div><h1>${esc(D.certTitle)}</h1><div>이 증서를 받는 탐험대원은</div><div class="nm">${esc(S.name || '탐험대원')}</div>
+  <p>${esc(D.certText)}</p><p>📖 도감 ${Object.keys(S.dex).length}/${DEXN} · ⭐ Lv.${S.lv}</p><p><b>${ds}</b><br>${esc(D.boss.name)} 🦉</p></div>
+  ${again ? '' : '<p style="text-align:center">👑 박사 왕관을 받았어요! 옷장에서 바꿔 쓸 수 있어요.</p>'}<div style="text-align:center;margin-top:10px"><button class="btn" id="bagain">시험 다시 보기</button></div>`);
+  $('#bagain').onclick = bossIntroScreen;
+}
+function showMap() {
+  openModal(`<h2>🗺️ ${esc(D.regionName)} 지도</h2><canvas id="bigmap"></canvas><div class="legend"><span>🔴 나</span><span>⭐ 미션 장소</span><span style="color:#d89a00">● 아직 못 본 곳</span><span style="color:#34b26b">● 자연환경</span><span style="color:#5b7cfa">● 인문환경</span></div><p style="font-size:13px;color:#777;text-align:center">${esc(D.mapNote || '실제 지도를 단순하게 바꾼 탐험용 지도예요.')}</p>`);
+  const c = $('#bigmap'); const w = 720, h = Math.round(720 * WH / WW); c.width = w; c.height = h;
+  drawMapDyn(c.getContext('2d'), w, h, true);
+}
+function showHelp() {
+  openModal(`<h2>❔ 탐험 방법</h2><div class="how" style="margin-top:0">${D.howto}</div>
+  <h3>🌿 자연환경과 🏙️ 인문환경</h3><p><b>자연환경</b>은 산, 하천, 바다, 갯벌, 날씨처럼 사람이 만들지 않은 환경이에요.<br><b>인문환경</b>은 도로, 건물, 논밭, 항구, 공원처럼 사람이 자연을 이용하거나 새로 만든 환경이에요.</p>
+  <h3>⚙️ 설정</h3><div class="row two"><button class="btn gray" id="bReset">처음부터 다시 하기</button></div>`);
+  $('#bReset').onclick = () => {
+    openModal(`<h2>정말 처음부터 할까요?</h2><p>도감, 미션, 코인, 사진이 모두 지워져요.</p><div class="row two"><button class="btn" id="rNo">아니요</button><button class="btn gray" id="rYes">네, 지울래요</button></div>`);
+    $('#rNo').onclick = closeModal; $('#rYes').onclick = () => { try { localStorage.removeItem(SKEY); } catch (e) { } location.reload(); };
+  };
+}
+document.querySelectorAll('#tabs [data-m]').forEach(b => b.onclick = () => { sfx('click'); ({ missions: showMissions, dex: showDex, album: showAlbum, closet: showCloset, boss: showBoss })[b.dataset.m](); });
+$('#bMap').onclick = showMap; mini.onclick = showMap; $('#bHelp').onclick = showHelp;
+
+/* ---------- photo ---------- */
+let photoMode = false;
+function enterPhoto() { if (uiBlocked()) return; photoMode = true; $('#photoUI').hidden = false; $('#prompt').hidden = true; }
+function exitPhoto() { photoMode = false; $('#photoUI').hidden = true; }
+function snap() {
+  sfx('snap');
+  const fl = $('#flash'); fl.style.transition = 'none'; fl.style.opacity = 1; requestAnimationFrame(() => { fl.style.transition = 'opacity .4s'; fl.style.opacity = 0; });
+  const sw = cv.width * 0.6, sh = cv.height * 0.6, sx = cv.width * 0.2, sy = cv.height * 0.2;
+  const o = document.createElement('canvas'); o.width = 300; o.height = Math.round(300 * sh / sw);
+  o.getContext('2d').drawImage(cv, sx, sy, sw, sh, 0, 0, o.width, o.height);
+  let img = ''; try { img = o.toDataURL('image/jpeg', 0.72); } catch (e) { }
+  // what is in frame?
+  const inFrame = pt => { const x = (pt[0] - cam.x) * cam.z + W / 2, y = (pt[1] - cam.y) * cam.z + H / 2; return x > W * 0.2 && x < W * 0.8 && y > H * 0.2 && y < H * 0.8; };
+  let label = D.regionName + ' 풍경', bestD = 1e9;
+  for (const p of POIS) { const pt = p.look || [p.x, p.y]; if (inFrame(pt)) { const d = dist([P1.x, P1.y], pt); if (d < bestD) { bestD = d; label = p.name; } } }
+  if (img) { S.photos.unshift({ img, t: label }); S.photos = S.photos.slice(0, 8); }
+  let hit = false;
+  for (const m of MISSIONS) {
+    if (S.missions[m.id] || m.kind !== 'photo') continue;
+    const p = POI[m.target]; const pt = p.look || [p.x, p.y];
+    if (inFrame(pt) && dist([P1.x, P1.y], pt) < (m.range || 420)) { completeMission(m); hit = true; }
+  }
+  toast(hit ? `📸 미션 사진 성공! 「${label}」` : `📸 찰칵! 「${label}」 앨범에 저장했어요`, hit ? 'good' : '');
+  save();
+}
+$('#bPhoto').onclick = () => (photoMode ? exitPhoto() : enterPhoto());
+$('#shutter').onclick = snap; $('#photoClose').onclick = exitPhoto;
+
+/* ---------- input ---------- */
+const keys = {};
+let started = false;
+const uiBlocked = () => !started || dialogOpen() || modalOpen() || !!riding;
+addEventListener('keydown', e => {
+  if (!started) return;
+  const k = e.key.toLowerCase();
+  if (e.target && e.target.tagName === 'INPUT') return;
+  if (k === 'tab') e.preventDefault();
+  if (dialogOpen()) { if ((k === 'e' || k === 'enter' || k === ' ') && !$('#dNext').hidden) { e.preventDefault(); nextLine(); } if (k === 'escape') { dq = []; nextLine(); } return; }
+  if (modalOpen()) { if (k === 'escape') closeModal(); return; }
+  if (photoMode) { if (k === 'escape') exitPhoto(); if (k === 'c' || k === 'p' || k === ' ' || k === 'enter') { e.preventDefault(); snap(); } return; }
+  keys[k] = true;
+  if (k === ' ') { e.preventDefault(); jump(); }
+  if (k === 'e' || k === 'enter') interact();
+  if (k === 'tab' || k === 'i') showDex();
+  if (k === 'q') showMissions();
+  if (k === 'm') showMap();
+  if (k === 'h') showHelp();
+  if (k === 'c' || k === 'p') enterPhoto();
+  if (k === '=' || k === '+') zoomBy(1.15);
+  if (k === '-' || k === '_') zoomBy(1 / 1.15);
+});
+addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
+function zoomBy(f) { cam.z = Math.max(ZMIN, Math.min(ZMAX, cam.z * f)); }
+function clampCam() {
+  const hw = W / 2 / cam.z, hh = H / 2 / cam.z;
+  cam.x = WW > hw * 2 ? Math.max(hw, Math.min(WW - hw, cam.x)) : WW / 2;
+  cam.y = WH > hh * 2 ? Math.max(hh, Math.min(WH - hh, cam.y)) : WH / 2;
+}
+cv.addEventListener('wheel', e => { e.preventDefault(); zoomBy(e.deltaY < 0 ? 1.1 : 1 / 1.1); }, { passive: false });
+function jump() { if (P1.z <= 0 && !uiBlocked()) { P1.vz = 260; sfx('click'); } }
+// pinch zoom on canvas
+const pts = new Map(); let pinch0 = 0, z0 = 1;
+cv.addEventListener('pointerdown', e => { pts.set(e.pointerId, [e.clientX, e.clientY]); if (pts.size === 2) { const a = [...pts.values()]; pinch0 = dist(a[0], a[1]); z0 = cam.z; } });
+cv.addEventListener('pointermove', e => { if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, [e.clientX, e.clientY]); if (pts.size === 2 && pinch0) { const a = [...pts.values()]; cam.z = Math.max(ZMIN, Math.min(ZMAX, z0 * dist(a[0], a[1]) / pinch0)); } });
+['pointerup', 'pointercancel', 'pointerleave'].forEach(t => cv.addEventListener(t, e => { pts.delete(e.pointerId); if (pts.size < 2) pinch0 = 0; }));
+// joystick
+const joy = { x: 0, y: 0, id: null };
+const jEl = $('#joy'), kEl = $('#knob');
+jEl.addEventListener('pointerdown', e => { joy.id = e.pointerId; jEl.setPointerCapture(e.pointerId); joyMove(e); });
+jEl.addEventListener('pointermove', e => { if (e.pointerId === joy.id) joyMove(e); });
+const joyEnd = e => { if (e.pointerId !== joy.id) return; joy.id = null; joy.x = joy.y = 0; kEl.style.transform = ''; };
+jEl.addEventListener('pointerup', joyEnd); jEl.addEventListener('pointercancel', joyEnd);
+function joyMove(e) { const r = jEl.getBoundingClientRect(); let dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2); const L = Math.hypot(dx, dy), M = r.width / 2 - 10; if (L > M) { dx *= M / L; dy *= M / L; } joy.x = dx / M; joy.y = dy / M; kEl.style.transform = `translate(${dx}px,${dy}px)`; }
+$('#tAct').onclick = interact; $('#tJump').onclick = jump; $('#tIn').onclick = () => zoomBy(1.2); $('#tOut').onclick = () => zoomBy(1 / 1.2);
+
+/* ---------- loop ---------- */
+let last = performance.now(), acc = 0;
+function loop(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (started) update(dt);
+  render();
+  if (started) { drawMapDyn(mctx, mini.width, mini.height, false); updateQuestArrow(); }
+  requestAnimationFrame(loop);
+}
+function update(dt) {
+  tideUpdate(dt);
+  if (riding) { rideUpdate(dt); const rp = riding ? riding.pos : [P1.x, P1.y]; cam.x += (rp[0] - cam.x) * Math.min(1, dt * 5); cam.y += (rp[1] - cam.y) * Math.min(1, dt * 5); clampCam(); return; }
+  let mx = 0, my = 0;
+  if (!uiBlocked() && !photoMode) {
+    if (keys['arrowleft'] || keys['a']) mx -= 1; if (keys['arrowright'] || keys['d']) mx += 1;
+    if (keys['arrowup'] || keys['w']) my -= 1; if (keys['arrowdown'] || keys['s']) my += 1;
+    if (joy.id !== null) { mx += joy.x; my += joy.y; }
+  }
+  const L = Math.hypot(mx, my);
+  P1.moving = L > 0.1;
+  if (P1.moving) {
+    if (L > 1) { mx /= L; my /= L; }
+    const run = keys['shift'] || Math.hypot(joy.x, joy.y) > 0.95;
+    let sp = (run ? 250 : 160);
+    const a = areaAt(P1.x, P1.y); if (a && a.t === 'mud') sp *= 0.6;
+    const nx = P1.x + mx * sp * dt, ny = P1.y + my * sp * dt;
+    const ok = (x, y) => walkable(x, y) && walkable(x + 7, y) && walkable(x - 7, y) && walkable(x, y + 4);
+    if (ok(nx, P1.y)) P1.x = nx;
+    if (ok(P1.x, ny)) P1.y = ny;
+    P1.face = [mx, my]; P1.step += dt;
+  }
+  if (P1.z > 0 || P1.vz > 0) { P1.vz -= 900 * dt; P1.z = Math.max(0, P1.z + P1.vz * dt); if (P1.z === 0) P1.vz = 0; }
+  if (safeGround(P1.x, P1.y)) lastSafe = [P1.x, P1.y];
+  // items
+  for (const it of ITEMS) {
+    if (S.items[it.key] || (it.tide && !lowTide)) continue;
+    if (Math.hypot(it.x - P1.x, it.y - P1.y) < 28) { S.items[it.key] = 1; sfx('pick'); S.coins += 2; toast(`${it.icon} ${it.name || '주웠어요'} +🪙2`); checkAgg(); updateHUD(); save(); }
+  }
+  checkReach();
+  // camera
+  cam.x += (P1.x - cam.x) * Math.min(1, dt * 6); cam.y += (P1.y - 30 - cam.y) * Math.min(1, dt * 6);
+  clampCam();
+  // nearest
+  near = (!uiBlocked() && !photoMode) ? nearest() : null;
+  const pr = $('#prompt');
+  if (near) { pr.hidden = false; $('#promptText').textContent = near.label; } else pr.hidden = true;
+  saveT += dt; if (saveT > 5) { saveT = 0; save(); }
+}
+
+/* ---------- start ---------- */
+function begin(isNew) {
+  const nm = $('#sName').value.trim().slice(0, 10);
+  if (isNew) { const keepName = nm; S = fresh(); S.name = keepName || '탐험대원'; }
+  else if (nm) S.name = nm;
+  if (S.pos && !isNew && walkable(S.pos[0], S.pos[1], true)) { P1.x = S.pos[0]; P1.y = S.pos[1]; }
+  if (!walkable(P1.x, P1.y)) { P1.x = D.spawn[0]; P1.y = D.spawn[1]; }
+  cam.x = P1.x; cam.y = P1.y;
+  $('#start').hidden = true; $('#hud').hidden = false; started = true;
+  sfx('win'); updateHUD(); save();
+  if (isNew) say(D.intro.map(l => Object.assign({}, l)), () => toast('🎯 첫 미션: ' + currentMission().title));
+  else toast(`👋 다시 왔군요, ${S.name}!`, 'good');
+}
+function showStart() {
+  $('#loading').hidden = true; $('#start').hidden = false;
+  $('#sLogo').textContent = D.logo; $('#sTitle').innerHTML = D.titleHTML; $('#sSub').textContent = D.subtitle; $('#sHow').innerHTML = D.howto;
+  const sv = load();
+  const btns = $('#sBtns');
+  if (sv) { S = sv; $('#sName').value = sv.name || ''; btns.innerHTML = `<button class="btn" id="bCont">이어서 탐험하기 ▶</button><button class="btn gray" id="bNew">처음부터</button>`; $('#bCont').onclick = () => begin(false); $('#bNew').onclick = () => { openModal(`<h2>처음부터 할까요?</h2><p>저장된 도감과 미션 기록이 지워져요.</p><div class="row two"><button class="btn" id="nNo">아니요</button><button class="btn gray" id="nYes">네, 새로 할래요</button></div>`); $('#modal').style.zIndex = 50; $('#nNo').onclick = () => { closeModal(); $('#modal').style.zIndex = ''; }; $('#nYes').onclick = () => { closeModal(); $('#modal').style.zIndex = ''; begin(true); }; }; }
+  else { btns.innerHTML = `<button class="btn" id="bNew">탐험 시작! 🚀</button>`; $('#bNew').onclick = () => begin(true); }
+  $('#sName').addEventListener('keydown', e => { if (e.key === 'Enter') (sv ? begin(false) : begin(true)); });
+}
+makePatterns(); buildMap();
+requestAnimationFrame(loop);
+setTimeout(showStart, 500);
+window.__game = { S: () => S, P1, cam, D, walkable, ev, completeMission, MISSIONS, interact, nearest: () => near, setPos: (x, y) => { P1.x = x; P1.y = y; cam.x = x; cam.y = y; }, tide: () => lowTide };
+})();
+
+</script>
+</body>
+</html>
